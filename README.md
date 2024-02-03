@@ -18,7 +18,12 @@ As recommended, we consulted PM Knowledge Center, a collection of resources on "
 
 - Generate a schedule.
 
-To quote: "A schedule generation scheme makes use of the priority list constructed in the previous step and aims at the generation of a feasible schedule by extending the partial schedule (i.e. a schedule where only a subset of the activities has been assigned a starting and finishing time) in a stage-wise fashion. At the start of the heuristic scheduling process, the partial schedule is empty and all activities are available to be scheduled. Afterwards, activities are selected according to their priorities and are put in the schedule following the rules of the generation scheme."
+To quote:
+
+```
+A schedule generation scheme makes use of the priority list constructed in the previous step and aims at the generation of a feasible schedule by extending the partial schedule (i.e. a schedule where only a subset of the activities has been assigned a starting and finishing time) in a stage-wise fashion. At the start of the heuristic scheduling process, the partial schedule is empty and all activities are available to be scheduled. Afterwards, activities are selected according to their priorities and are put in the schedule following the rules of the generation scheme.
+
+```
 
 Generation schemes are said to fall into two categories:
 
@@ -44,7 +49,7 @@ Network logic suggests rules such as
 
 - Greatest Rank Positional Weight (GRPW): The GRPW is calculated as the sum of the duration of the activity and the durations of its immediate successors.
 
-Scheduling data givs rise to
+Scheduling data gives rise to
 
 - Earliest Start Time (EST): Put the activities in an increasing order of their earliest start in the list.
 
@@ -56,8 +61,14 @@ Scheduling data givs rise to
 
 - Minimum Slack (MSLK): Put the activities in an increasing order of their slack value in the list.
 
-Resource data suggests
+Resource data:
 
 - Greatest Resource Work Content (GRWC): Put the activities in a decreasing order of their work content in the list.
 
 - Greatest Cumulative Resource Work Content (GCRWC): Put the activities in a decreasing order of the sum of their work content and the work content of all their immediate successors in the list.
+
+To quote Mario again:
+
+```
+It should be noted that for each activity list, the network structure has been taken into account. This means that an activity can never be placed in the list before another activity if the latter is a (direct or indirect) predecessor of the former.
+```
