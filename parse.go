@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"regexp"
 	"strconv"
@@ -25,8 +26,8 @@ func parseFile(config string) ([]resource, []process, goal, error) {
 	for scanner.Scan() {
 		line := string(scanner.Text())
 
-		// Skip comments.
-		if strings.HasPrefix(line, "#") {
+		// Ignore comments and empty lines.
+		if strings.HasPrefix(line, "#") || len(strings.TrimSpace(line)) == 0 {
 			continue
 		}
 
@@ -58,7 +59,13 @@ func parseFile(config string) ([]resource, []process, goal, error) {
 		return nil, nil, goal{}, fmt.Errorf("invalid line: %s", line)
 	}
 
-	// If no goal was found, return an error.
+	// Missing resources, processes, or goal.
+	if len(resources) == 0 {
+		log.Fatal("no resources found")
+	}
+	if len(processes) == 0 {
+		log.Fatal("no processes found")
+	}
 	if !foundGoal {
 		return nil, nil, goal{}, fmt.Errorf("no goal found")
 	}
@@ -94,14 +101,16 @@ func parseGoal(s string) (goal, error) {
 	time := false
 	if strings.Contains(s, "time") {
 		time = true
-	}
-	semicolonIndex := strings.Index(s, ";")
-	closingParenthesisIndex := strings.Index(s, ")")
-	if semicolonIndex != -1 && closingParenthesisIndex != -1 && closingParenthesisIndex > semicolonIndex {
-		product = s[semicolonIndex+1 : closingParenthesisIndex]
-	}
-	if product == "" {
-		return goal{}, fmt.Errorf("invalid goal: %s", s)
+		semicolonIndex := strings.Index(s, ";")
+		closingParenthesisIndex := strings.Index(s, ")")
+		if semicolonIndex != -1 && closingParenthesisIndex != -1 && closingParenthesisIndex > semicolonIndex {
+			product = s[semicolonIndex+1 : closingParenthesisIndex]
+		}
+	} else {
+		closingParenthesisIndex := strings.Index(s, ")")
+		if closingParenthesisIndex != -1 {
+			product = s[10:closingParenthesisIndex]
+		}
 	}
 	return goal{product, time}, nil
 }

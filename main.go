@@ -7,9 +7,11 @@ import (
 )
 
 func main() {
-	var resources []resource
-	var processes []process
-	var goal goal
+	checkArgs()
+
+	if len(os.Args) == 3 {
+		setTimer()
+	}
 
 	resources, processes, goal, err := parseFile("./" + os.Args[1])
 	if err != nil {
@@ -29,4 +31,17 @@ func main() {
 	fmt.Println("\nOptimize:")
 	fmt.Println(goal.string())
 	fmt.Println()
+
+	fmt.Scanln()
+}
+
+func checkArgs() {
+	if len(os.Args) > 3 {
+		log.Println("too many arguments")
+		log.Fatal("usage: ./stock_exchange <file> <waiting_time>")
+	}
+	if len(os.Args) < 2 {
+		log.Println("not enough arguments")
+		log.Fatal("usage: ./stock_exchange <file> <waiting_time>")
+	}
 }
