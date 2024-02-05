@@ -16,13 +16,14 @@ type resource struct {
 }
 
 type process struct {
-	name        string
-	ingredients []resource
-	products    []resource
-	time        int
-	successor   *process
-	initial     bool
-	final       bool
+	name         string
+	ingredients  []resource
+	products     []resource
+	time         int
+	successor    *process
+	predecessors []*process
+	initial      bool
+	final        bool
 }
 
 func (g goal) string() string {
@@ -48,9 +49,18 @@ func (p process) string() string {
 	if p.successor != nil {
 		sucessor = p.successor.name
 	} else if p.final {
-		sucessor = "nil"
+		sucessor = "none"
 	}
 
-	return fmt.Sprintf("NAME: %s, INGREDIENTS: %s, PRODUCTS: %s, TIME: %d, SUCCESOR: %s",
-		p.name, strings.Join(ingredients, ", "), strings.Join(products, ", "), p.time, sucessor)
+	var predecessors string
+	if len(p.predecessors) == 0 {
+		predecessors = "none"
+	}
+	for _, predecessor := range p.predecessors {
+		predecessors += predecessor.name + ", "
+	}
+	predecessors = strings.TrimSuffix(predecessors, ", ")
+
+	return fmt.Sprintf("NAME: %s, INGREDIENTS: %s, PRODUCTS: %s, TIME: %d,\nSUCCESOR: %s,\nPREDECESSORS: %s\n",
+		p.name, strings.Join(ingredients, ", "), strings.Join(products, ", "), p.time, sucessor, predecessors)
 }

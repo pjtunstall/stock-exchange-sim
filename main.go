@@ -24,6 +24,7 @@ func main() {
 	for _, r := range resources {
 		fmt.Println(r.string())
 	}
+	fmt.Println()
 
 	fmt.Println("\nProcesses:")
 	for _, p := range processes {
