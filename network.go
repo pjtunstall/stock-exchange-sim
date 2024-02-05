@@ -1,12 +1,15 @@
 package main
 
-func buildNetwork(resources []resource, processes []process, g goal) {
+import "fmt"
+
+func buildNetwork(resources []resource, processes []process, g goal) []process {
 	var curr []process
-	for _, process := range processes {
-		for _, product := range process.products {
+	for i := range processes {
+		for _, product := range processes[i].products {
 			if product.name == g.product {
-				process.final = true
-				curr = append(curr, process)
+				processes[i].final = true
+				curr = append(curr, processes[i])
+				// fmt.Println("Final process: ", processes[i].string())
 			}
 		}
 	}
@@ -21,11 +24,12 @@ func buildNetwork(resources []resource, processes []process, g goal) {
 						c.initial = true
 					}
 				}
-				for _, process := range processes {
-					for _, product := range process.products {
+				for i := range processes {
+					for _, product := range processes[i].products {
 						if ingredient.name == product.name {
-							process.successor = &c
-							next = append(next, process)
+							processes[i].successor = &c
+							fmt.Println("Process: ", processes[i].string())
+							next = append(next, processes[i])
 						}
 					}
 				}
@@ -33,4 +37,6 @@ func buildNetwork(resources []resource, processes []process, g goal) {
 		}
 		curr = next
 	}
+
+	return processes
 }

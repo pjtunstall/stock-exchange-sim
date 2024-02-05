@@ -44,6 +44,13 @@ func (p process) string() string {
 		products[i] = fmt.Sprintf("%s: %d", product.name, product.quantity)
 	}
 
-	return fmt.Sprintf("NAME: %s, INGREDIENTS: %s, PRODUCTS: %s, TIME: %d",
-		p.name, strings.Join(ingredients, ", "), strings.Join(products, ", "), p.time)
+	var sucessor string
+	if p.successor != nil {
+		sucessor = p.successor.name
+	} else if p.final {
+		sucessor = "nil"
+	}
+
+	return fmt.Sprintf("NAME: %s, INGREDIENTS: %s, PRODUCTS: %s, TIME: %d, SUCCESOR: %s",
+		p.name, strings.Join(ingredients, ", "), strings.Join(products, ", "), p.time, sucessor)
 }

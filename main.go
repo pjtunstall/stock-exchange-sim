@@ -18,6 +18,8 @@ func main() {
 		log.Fatalf("error parsing file: %v", err)
 	}
 
+	buildNetwork(resources, processes, goal)
+
 	fmt.Println("\nResources:")
 	for _, r := range resources {
 		fmt.Println(r.string())
@@ -31,8 +33,6 @@ func main() {
 	fmt.Println("\nOptimize:")
 	fmt.Println(goal.string())
 	fmt.Println()
-
-	buildNetwork(resources, processes, goal)
 
 	fmt.Scanln()
 }
