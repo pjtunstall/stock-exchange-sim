@@ -20,6 +20,8 @@ type process struct {
 	ingredients []resource
 	products    []resource
 	time        int
+	successor   *process
+	final       bool
 }
 
 func (g goal) string() string {

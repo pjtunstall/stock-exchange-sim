@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"regexp"
 	"strconv"
@@ -61,10 +60,10 @@ func parseFile(config string) ([]resource, []process, goal, error) {
 
 	// Missing resources, processes, or goal.
 	if len(resources) == 0 {
-		log.Fatal("no resources found")
+		return nil, nil, goal{}, fmt.Errorf("no resources found")
 	}
 	if len(processes) == 0 {
-		log.Fatal("no processes found")
+		return nil, nil, goal{}, fmt.Errorf("no processes found")
 	}
 	if !foundGoal {
 		return nil, nil, goal{}, fmt.Errorf("no goal found")
@@ -155,7 +154,10 @@ func parseProcess(s string) (process, error) {
 		return process{}, fmt.Errorf("invalid process: %s", s)
 	}
 
-	return process{name, ingredients, products, time}, nil
+	return process{name: name,
+		ingredients: ingredients,
+		products:    products,
+		time:        time}, nil
 }
 
 func splitProcess(line string) ([]string, error) {
