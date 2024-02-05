@@ -32,6 +32,8 @@ func main() {
 	fmt.Println(goal.string())
 	fmt.Println()
 
+	buildNetwork(resources, processes, goal)
+
 	fmt.Scanln()
 }
 

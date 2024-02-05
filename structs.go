@@ -21,6 +21,7 @@ type process struct {
 	products    []resource
 	time        int
 	successor   *process
+	initial     bool
 	final       bool
 }
 
