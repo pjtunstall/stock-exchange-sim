@@ -2,14 +2,17 @@ package main
 
 import "fmt"
 
-func buildNetwork(resources []resource, processes []process, g goal) []process {
+func buildNetwork(resources []resource, processes []process, g goal) {
 	var curr []process
+
+	// Find the processes that produce the goal product.
+	// Can't use range here because we're modifying elements of the processes
+	// slice while iterating over it. Range would create a copy of the slice.
 	for i := range processes {
 		for _, product := range processes[i].products {
 			if product.name == g.product {
 				processes[i].final = true
 				curr = append(curr, processes[i])
-				// fmt.Println("Final process: ", processes[i].string())
 			}
 		}
 	}
@@ -24,6 +27,8 @@ func buildNetwork(resources []resource, processes []process, g goal) []process {
 						c.initial = true
 					}
 				}
+				// Can't use range here because we're modifying elements of the processes
+				// slice while iterating over it. Range would create a copy of the slice.
 				for i := range processes {
 					for _, product := range processes[i].products {
 						if ingredient.name == product.name {
@@ -37,6 +42,4 @@ func buildNetwork(resources []resource, processes []process, g goal) []process {
 		}
 		curr = next
 	}
-
-	return processes
 }
