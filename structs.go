@@ -24,6 +24,42 @@ type process struct {
 	predecessors []*process
 	initial      bool
 	final        bool
+	minCount     Rational
+	count        int
+}
+
+type Rational struct {
+	Numerator   int
+	Denominator int
+}
+
+func (r Rational) Plus(other Rational) Rational {
+	return Rational{
+		Numerator:   r.Numerator*other.Denominator + other.Numerator*r.Denominator,
+		Denominator: r.Denominator * other.Denominator,
+	}
+}
+
+func (r Rational) Times(other Rational) Rational {
+	return Rational{
+		Numerator:   r.Numerator * other.Numerator,
+		Denominator: r.Denominator * other.Denominator,
+	}
+}
+
+func (r Rational) Simplify() Rational {
+	gcd := gcd(r.Numerator, r.Denominator)
+	return Rational{
+		Numerator:   r.Numerator / gcd,
+		Denominator: r.Denominator / gcd,
+	}
+}
+
+func gcd(a, b int) int {
+	if b == 0 {
+		return a
+	}
+	return gcd(b, a%b)
 }
 
 func (g goal) string() string {
@@ -61,6 +97,9 @@ func (p process) string() string {
 	}
 	predecessors = strings.TrimSuffix(predecessors, ", ")
 
-	return fmt.Sprintf("NAME: %s, INGREDIENTS: %s, PRODUCTS: %s, TIME: %d,\nSUCCESOR: %s,\nPREDECESSORS: %s\n",
+	result := fmt.Sprintf("NAME: %s, INGREDIENTS: %s, PRODUCTS: %s, TIME: %d,\nSUCCESOR: %s, PREDECESSORS: %s,",
 		p.name, strings.Join(ingredients, ", "), strings.Join(products, ", "), p.time, sucessor, predecessors)
+	result += fmt.Sprintf("\nMINCOUNT: %d, COUNT: %d\n", p.minCount, p.count)
+
+	return result
 }

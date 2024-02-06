@@ -20,6 +20,9 @@ func main() {
 
 	buildNetwork(resources, processes, goal)
 
+	// // Work in progress: count number of times each process must be run.
+	// count(resources, processes, goal)
+
 	fmt.Println("\nResources:")
 	for _, r := range resources {
 		fmt.Println(r.string())
@@ -35,7 +38,8 @@ func main() {
 	fmt.Println(goal.string())
 	fmt.Println()
 
-	fmt.Scanln()
+	// // For testing timer.
+	// fmt.Scanln()
 }
 
 func checkArgs() {

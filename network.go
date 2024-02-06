@@ -11,12 +11,13 @@ func buildNetwork(resources []resource, processes []process, g goal) {
 	}
 
 	// Find the processes that produce the goal product.
-	// Can't use range here because we're modifying elements of the processes
+	// Can't use _, range here because we want to modify elements of the processes
 	// slice while iterating over it. Range would create a copy of the slice.
 	for i := range processes {
 		for _, product := range processes[i].products {
 			if product.name == g.product {
 				processes[i].final = true
+				processes[i].minCount = Rational{Numerator: 1, Denominator: 1}
 				curr = append(curr, &processes[i])
 			}
 		}
@@ -35,12 +36,12 @@ func buildNetwork(resources []resource, processes []process, g goal) {
 		var next []*process
 		for k := range curr {
 			for _, ingredient := range curr[k].ingredients {
-				// Can't use range here because we're modifying elements of the processes
-				// slice while iterating over it. Range would create a copy of the slice.
 				for i := range processes {
 					for _, product := range processes[i].products {
 						if ingredient.name == product.name {
 							processes[i].successor = curr[k]
+							r := Rational{ingredient.quantity, 1}.Times(curr[k].minCount)
+							processes[i].minCount = r.Times(Rational{1, product.quantity}).Simplify()
 							curr[k].predecessors = append(curr[k].predecessors, &processes[i])
 							next = append(next, &processes[i])
 						}

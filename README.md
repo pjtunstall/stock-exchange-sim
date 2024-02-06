@@ -40,16 +40,20 @@ In Priority Rule Based Scheduling, a graph of precedence relationships is drawn 
 
 - Parallel
 
-A serial schedule generation scheme with N tasks takes N steps. One task is chosen, at each step, from the set of available tasks and moved to the set of completed tasks. (A task is available if it is the direct the successor to a completed task, and current resources suffice to perform it.) If multiple tasks are available, one is chosen according to the priority rule. If several have equal priority, the one with the lowest activity number is selected.
+A SERIAL schedule generation scheme with N tasks takes N steps. One task is chosen, at each step, from the set of available tasks and moved to the set of completed tasks. (A task is available if it is the direct the successor to a completed task, and current resources suffice to perform it.) If multiple tasks are available, one is chosen according to the priority rule. If several have equal priority, the one with the lowest activity number is selected.
 
-A parallel schedule generation scheme with N tasks takes at most N steps. At each step, we schedule zero or more activities. Tasks are partitioned into completed, in progress, and available. The schedule time associated with a step is calculated as the earliest completion time of the tasks that were in progress during the previous step. Tasks whose finish time is equal to the schedule time are moved from the set of tasks in progress to the set of completed tasks. This may make other tasks available. As long as tasks are available, they're chosen one by one, in order as in a serial scheme, and started at the current schedule time, then we move on to the next step. The algorithm terminates when all tasks are completed or in progress.
+A PARALLEL schedule generation scheme with N tasks takes at most N steps. At each step, we schedule zero or more activities. Tasks are partitioned into completed, in progress, and available. The schedule time associated with a step is calculated as the earliest completion time of the tasks that were in progress during the previous step. Tasks whose finish time is equal to the schedule time are moved from the set of tasks in progress to the set of completed tasks. This may make other tasks available. As long as tasks are available, they're chosen one by one, in order as in a serial scheme, and started at the current schedule time, then we move on to the next step. The algorithm terminates when all tasks are completed or in progress.
 
 ## 4. Strategy
 
-Let's also start with the simplifying assumption that, as in our examples, tasks can have multiple predecessors but only one sucessor.
+After all that, neither scheme quite works for us, given the different underlying assumptions of our project: multiple instances of a task schedulable, possibly simultaneously. But we can take inspiration from them.
+
+Let's start with the simplifying assumption that, as in our examples, tasks can have multiple predecessors but only one sucessor.
 
 Write a function to number tasks in a way that respects precedence.
 
-Let the doCount of a task be the number of times it's scheduled to be performed. Set all doCounts to zero initially. Define the strength of a task as doCount times the number of units of target product (goal) it leads to per unit of resource it consumes. Assuming only essential tasks make it into the graph, we could increment a task's doCount till it reachest the minimum needed to make one unit of the end product. Repeat till the resources are all used up. Then mark current tasks as completed, and move on to the next step.
+Let the doCount of a task be the number of times it's scheduled to be performed. Set all doCounts to zero initially. Define the strength of a task as doCount times the number of units of target product (goal) it leads to per unit of resource it consumes. Assuming only essential tasks make it into the graph, we could increment a task's doCount till it reaches the minimum needed to make one unit of the end product. Repeat till the resources are all used up. Then mark current tasks as completed, increment resources if they're renewable, then move on to the next step.
 
 For example, in `build`, we'd set the doCount of doorknobs to 2, background to 1, and shelf to 3. Since 2 \* 1 + 1 \* 2 + 3 \* 1 = 7, and there are 7 boards, we stop there. Time doesn't matter as we can schedule tasks an unlimited amount of times at once, and the only resource is never replenished. We just need to note when the cabinet building starts and finishes.
+
+...
