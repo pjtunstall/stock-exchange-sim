@@ -4,7 +4,7 @@ func buildNetwork(resources []resource, processes []process, g goal) {
 	var curr []*process
 
 	// Maximum number of predecessors for a process. Adjust as needed.
-	n := 8
+	n := 64
 
 	for i := range processes {
 		processes[i].predecessors = make([]*process, 0, n)

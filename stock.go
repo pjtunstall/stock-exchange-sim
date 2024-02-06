@@ -41,10 +41,10 @@ func main() {
 func checkArgs() {
 	if len(os.Args) > 3 {
 		log.Println("too many arguments")
-		log.Fatal("usage: ./stock_exchange <file> <waiting_time>")
+		log.Fatal("usage: ./stock <file> <waiting_time>")
 	}
 	if len(os.Args) < 2 {
 		log.Println("not enough arguments")
-		log.Fatal("usage: ./stock_exchange <file> <waiting_time>")
+		log.Fatal("usage: ./stock <file> <waiting_time>")
 	}
 }
