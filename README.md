@@ -52,8 +52,8 @@ Let's start with the simplifying assumption that, as in our examples, tasks can 
 
 Write a function to number tasks in a way that respects precedence.
 
-Let the doCount of a task be the number of times it's scheduled to be performed. Set all doCounts to zero initially. Define the strength of a task as doCount times the number of units of target product (goal) it leads to per unit of resource it consumes. Assuming only essential tasks make it into the graph, we could increment a task's doCount till it reaches the minimum needed to make one unit of the end product. Repeat till the resources are all used up. Then mark current tasks as completed, increment resources if they're renewable, then move on to the next step.
+Let the count of a task be the number of times it's scheduled to be performed. Set all counts to zero initially. Define the strength of a task as count times the number of units of target product (goal) it leads to per unit of resource it consumes. Assuming only essential tasks make it into the graph, we could increment a task's count till it reaches the minimum needed to make one unit of the end product. Repeat till the resources are all used up. Then mark current tasks as completed, increment resources if they're renewable, then move on to the next step.
 
-For example, in `build`, we'd set the doCount of doorknobs to 2, background to 1, and shelf to 3. Since 2 \* 1 + 1 \* 2 + 3 \* 1 = 7, and there are 7 boards, we stop there. Time doesn't matter as we can schedule tasks an unlimited amount of times at once, and the only resource is never replenished. We just need to note when the cabinet building starts and finishes.
+For example, in `build`, we'd set the count of doorknobs to 2, background to 1, and shelf to 3. Since 2 \* 1 + 1 \* 2 + 3 \* 1 = 7, and there are 7 boards, we stop there. Time doesn't matter as we can schedule tasks an unlimited amount of times at once, and the only resource is never replenished. We just need to note when the cabinet building starts and finishes.
 
 ...

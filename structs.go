@@ -62,6 +62,17 @@ func gcd(a, b int) int {
 	return gcd(b, a%b)
 }
 
+// func lcm(a []int) int {
+// 	if len(a) == 0 {
+// 		return 0
+// 	}
+// 	m := a[0]
+// 	for _, n := range a[1:] {
+// 		m = m * n / gcd(m, n)
+// 	}
+// 	return m
+// }
+
 func (g goal) string() string {
 	return fmt.Sprintf("PRODUCT: %s, TIME: %v", g.product, g.time)
 }
@@ -103,3 +114,13 @@ func (p process) string() string {
 
 	return result
 }
+
+// func (p process) strength() int {
+// 	n := p.count
+// 	d := 0
+// 	for _, ingredient := range p.ingredients {
+// 		d += ingredient.quantity
+// 	}
+// 	strength := n / d
+// 	return strength
+// }

@@ -2,7 +2,6 @@ package main
 
 func buildNetwork(resources []resource, processes []process, g goal) {
 	var curr []*process
-
 	// Maximum number of predecessors for a process. Adjust as needed.
 	n := 64
 
