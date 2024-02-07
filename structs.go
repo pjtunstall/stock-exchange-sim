@@ -45,10 +45,10 @@ func (r rational) Times(other rational) rational {
 	return rational{
 		Numerator:   r.Numerator * other.Numerator,
 		Denominator: r.Denominator * other.Denominator,
-	}
+	}.simplify()
 }
 
-func (r rational) Simplify() rational {
+func (r rational) simplify() rational {
 	gcd := gcd(r.Numerator, r.Denominator)
 	return rational{
 		Numerator:   r.Numerator / gcd,

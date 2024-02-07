@@ -6,6 +6,11 @@ func buildNetwork(resources []resource, processes []process, g goal) {
 	// Maximum number of predecessors for a process. Adjust as needed.
 	n := 64
 
+	// This will be used to assign activity numbers to the processes
+	// in such a way that successors always have greater numbers than
+	// their predecessors. This will allow us to have a default order
+	// of precedence for the processes to fall back on when there's
+	// nothing else to choose between them.
 	activityNumber := len(processes)
 
 	for i := range processes {
@@ -45,7 +50,7 @@ func buildNetwork(resources []resource, processes []process, g goal) {
 						if ingredient.name == product.name {
 							processes[i].successor = curr[k]
 							r := rational{ingredient.quantity, 1}.Times(curr[k].minCount)
-							processes[i].minCount = r.Times(rational{1, product.quantity}).Simplify()
+							processes[i].minCount = r.Times(rational{1, product.quantity})
 							processes[i].activityNumber = activityNumber
 							activityNumber--
 							curr[k].predecessors = append(curr[k].predecessors, &processes[i])
