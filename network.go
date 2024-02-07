@@ -2,8 +2,11 @@ package main
 
 func buildNetwork(resources []resource, processes []process, g goal) {
 	var curr []*process
+
 	// Maximum number of predecessors for a process. Adjust as needed.
 	n := 64
+
+	activityNumber := len(processes)
 
 	for i := range processes {
 		processes[i].predecessors = make([]*process, 0, n)
@@ -16,7 +19,9 @@ func buildNetwork(resources []resource, processes []process, g goal) {
 		for _, product := range processes[i].products {
 			if product.name == g.product {
 				processes[i].final = true
-				processes[i].minCount = Rational{Numerator: 1, Denominator: 1}
+				processes[i].minCount = rational{Numerator: 1, Denominator: 1}
+				processes[i].activityNumber = activityNumber
+				activityNumber--
 				curr = append(curr, &processes[i])
 			}
 		}
@@ -39,8 +44,10 @@ func buildNetwork(resources []resource, processes []process, g goal) {
 					for _, product := range processes[i].products {
 						if ingredient.name == product.name {
 							processes[i].successor = curr[k]
-							r := Rational{ingredient.quantity, 1}.Times(curr[k].minCount)
-							processes[i].minCount = r.Times(Rational{1, product.quantity}).Simplify()
+							r := rational{ingredient.quantity, 1}.Times(curr[k].minCount)
+							processes[i].minCount = r.Times(rational{1, product.quantity}).Simplify()
+							processes[i].activityNumber = activityNumber
+							activityNumber--
 							curr[k].predecessors = append(curr[k].predecessors, &processes[i])
 							next = append(next, &processes[i])
 						}
