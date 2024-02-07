@@ -1,6 +1,20 @@
 package main
 
-// import "fmt"
+func count(resources []resource, processes []process, goal goal) {
+	for i := range processes {
+		if processes[i].initial {
+			processes[i].start = 0
+			for j := range processes[i].ingredients {
+				for k := range resources {
+					if processes[i].ingredients[j].name == resources[k].name && resources[k].quantity > 0 && resources[k].quantity >= processes[i].ingredients[j].quantity {
+						resources[k].quantity -= processes[i].ingredients[j].quantity
+						processes[i].count = processes[i].minCount.numerator
+					}
+				}
+			}
+		}
+	}
+}
 
 // // Work in progress: count number of times each process must be run.
 // func count(resources []resource, processes []process, goal goal) {

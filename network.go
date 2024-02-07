@@ -15,6 +15,7 @@ func buildNetwork(resources []resource, processes []process, g goal) {
 
 	for i := range processes {
 		processes[i].predecessors = make([]*process, 0, n)
+		processes[i].start = -1
 	}
 
 	// Find the processes that produce the goal product.
@@ -24,7 +25,7 @@ func buildNetwork(resources []resource, processes []process, g goal) {
 		for _, product := range processes[i].products {
 			if product.name == g.product {
 				processes[i].final = true
-				processes[i].minCount = rational{Numerator: 1, Denominator: 1}
+				processes[i].minCount = rational{numerator: 1, denominator: 1}
 				processes[i].activityNumber = activityNumber
 				activityNumber--
 				curr = append(curr, &processes[i])
@@ -32,7 +33,7 @@ func buildNetwork(resources []resource, processes []process, g goal) {
 		}
 		for _, ingredient := range processes[i].ingredients {
 			for _, resource := range resources {
-				if ingredient.name == resource.name {
+				if ingredient.name == resource.name && resource.quantity > 0 && resource.quantity >= ingredient.quantity {
 					processes[i].initial = true
 					continue
 				}

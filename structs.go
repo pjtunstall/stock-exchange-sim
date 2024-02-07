@@ -27,32 +27,33 @@ type process struct {
 	minCount       rational
 	count          int
 	activityNumber int
+	start          int
 }
 
 type rational struct {
-	Numerator   int
-	Denominator int
+	numerator   int
+	denominator int
 }
 
 func (r rational) Plus(other rational) rational {
 	return rational{
-		Numerator:   r.Numerator*other.Denominator + other.Numerator*r.Denominator,
-		Denominator: r.Denominator * other.Denominator,
+		numerator:   r.numerator*other.denominator + other.numerator*r.denominator,
+		denominator: r.denominator * other.denominator,
 	}
 }
 
 func (r rational) Times(other rational) rational {
 	return rational{
-		Numerator:   r.Numerator * other.Numerator,
-		Denominator: r.Denominator * other.Denominator,
+		numerator:   r.numerator * other.numerator,
+		denominator: r.denominator * other.denominator,
 	}.simplify()
 }
 
 func (r rational) simplify() rational {
-	gcd := gcd(r.Numerator, r.Denominator)
+	gcd := gcd(r.numerator, r.denominator)
 	return rational{
-		Numerator:   r.Numerator / gcd,
-		Denominator: r.Denominator / gcd,
+		numerator:   r.numerator / gcd,
+		denominator: r.denominator / gcd,
 	}
 }
 
@@ -111,7 +112,7 @@ func (p process) string() string {
 
 	result := fmt.Sprintf("NAME: %s, INGREDIENTS: %s, PRODUCTS: %s, TIME: %d,\nSUCCESOR: %s, PREDECESSORS: %s,",
 		p.name, strings.Join(ingredients, ", "), strings.Join(products, ", "), p.time, sucessor, predecessors)
-	result += fmt.Sprintf("\nMINCOUNT: %d, COUNT: %d, ACTIVITY NUMBER: %d\n", p.minCount, p.count, p.activityNumber)
+	result += fmt.Sprintf("\nMINCOUNT: %d, COUNT: %d, INITIAL: %v, ACTIVITY NUMBER: %d, START: %d\n", p.minCount, p.count, p.initial, p.activityNumber, p.start)
 
 	return result
 }
