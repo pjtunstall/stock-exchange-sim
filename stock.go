@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 )
@@ -19,27 +18,36 @@ func main() {
 	}
 
 	buildNetwork(resources, processes, goal)
+	currentResources := make(map[string]int)
+	for i := range resources {
+		if resources[i].quantity > 0 {
+			currentResources[resources[i].name] = resources[i].quantity
+		}
+	}
 
 	// // Work in progress: count number of times each process must be run.
-	count(resources, processes, goal)
+	end := count(currentResources, processes, goal)
+	_ = buildOutput(currentResources, processes, end)
+	// writeOutput(s)
 
-	fmt.Println("\nResources:")
-	for _, r := range resources {
-		fmt.Println(r.string())
-	}
-	fmt.Println()
+	// fmt.Println("\nResources:")
+	// for _, r := range resources {
+	// 	fmt.Println(r.string())
+	// }
+	// fmt.Println()
 
-	fmt.Println("\nProcesses:")
-	for _, p := range processes {
-		fmt.Println(p.string())
-	}
+	// fmt.Println("\nProcesses:")
+	// for _, p := range processes {
+	// 	fmt.Println(p.string())
+	// }
 
-	fmt.Println("\nOptimize:")
-	fmt.Println(goal.string())
-	fmt.Println()
+	// fmt.Println("\nOptimize:")
+	// fmt.Println(goal.string())
+	// fmt.Println()
 
-	// // For testing timer.
-	// fmt.Scanln()
+	// for resource, quantity := range currentResources {
+	// 	fmt.Println(resource, quantity)
+	// }
 }
 
 func checkArgs() {

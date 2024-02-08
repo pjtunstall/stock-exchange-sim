@@ -1,10 +1,5 @@
 package main
 
-import (
-	"fmt"
-	"strings"
-)
-
 type goal struct {
 	product string
 	time    bool
@@ -26,6 +21,7 @@ type process struct {
 	final          bool
 	minCount       rational
 	count          int
+	maxCount       int
 	activityNumber int
 	start          int
 }
@@ -64,58 +60,58 @@ func gcd(a, b int) int {
 	return gcd(b, a%b)
 }
 
-// func lcm(a []int) int {
-// 	if len(a) == 0 {
-// 		return 0
-// 	}
-// 	m := a[0]
-// 	for _, n := range a[1:] {
-// 		m = m * n / gcd(m, n)
-// 	}
-// 	return m
+func lcm(a []int) int {
+	if len(a) == 0 {
+		return 0
+	}
+	m := a[0]
+	for _, n := range a[1:] {
+		m = m * n / gcd(m, n)
+	}
+	return m
+}
+
+// func (g goal) string() string {
+// 	return fmt.Sprintf("PRODUCT: %s, TIME: %v", g.product, g.time)
 // }
 
-func (g goal) string() string {
-	return fmt.Sprintf("PRODUCT: %s, TIME: %v", g.product, g.time)
-}
+// func (r resource) string() string {
+// 	return fmt.Sprintf("NAME: %s, QUANTITY: %d", r.name, r.quantity)
+// }
 
-func (r resource) string() string {
-	return fmt.Sprintf("NAME: %s, QUANTITY: %d", r.name, r.quantity)
-}
+// func (p process) string() string {
+// 	ingredients := make([]string, len(p.ingredients))
+// 	for i, ingredient := range p.ingredients {
+// 		ingredients[i] = fmt.Sprintf("%s: %d", ingredient.name, ingredient.quantity)
+// 	}
 
-func (p process) string() string {
-	ingredients := make([]string, len(p.ingredients))
-	for i, ingredient := range p.ingredients {
-		ingredients[i] = fmt.Sprintf("%s: %d", ingredient.name, ingredient.quantity)
-	}
+// 	products := make([]string, len(p.products))
+// 	for i, product := range p.products {
+// 		products[i] = fmt.Sprintf("%s: %d", product.name, product.quantity)
+// 	}
 
-	products := make([]string, len(p.products))
-	for i, product := range p.products {
-		products[i] = fmt.Sprintf("%s: %d", product.name, product.quantity)
-	}
+// 	var sucessor string
+// 	if p.successor != nil {
+// 		sucessor = p.successor.name
+// 	} else if p.final {
+// 		sucessor = "none"
+// 	}
 
-	var sucessor string
-	if p.successor != nil {
-		sucessor = p.successor.name
-	} else if p.final {
-		sucessor = "none"
-	}
+// 	var predecessors string
+// 	if len(p.predecessors) == 0 {
+// 		predecessors = "none"
+// 	}
+// 	for _, predecessor := range p.predecessors {
+// 		predecessors += predecessor.name + ", "
+// 	}
+// 	predecessors = strings.TrimSuffix(predecessors, ", ")
 
-	var predecessors string
-	if len(p.predecessors) == 0 {
-		predecessors = "none"
-	}
-	for _, predecessor := range p.predecessors {
-		predecessors += predecessor.name + ", "
-	}
-	predecessors = strings.TrimSuffix(predecessors, ", ")
+// 	result := fmt.Sprintf("NAME: %s, INGREDIENTS: %s, PRODUCTS: %s, TIME: %d,\nSUCCESOR: %s, PREDECESSORS: %s,",
+// 		p.name, strings.Join(ingredients, ", "), strings.Join(products, ", "), p.time, sucessor, predecessors)
+// 	result += fmt.Sprintf("\nMINCOUNT: %d, COUNT: %d, INITIAL: %v, ACTIVITY NUMBER: %d, START: %d\n", p.minCount, p.count, p.initial, p.activityNumber, p.start)
 
-	result := fmt.Sprintf("NAME: %s, INGREDIENTS: %s, PRODUCTS: %s, TIME: %d,\nSUCCESOR: %s, PREDECESSORS: %s,",
-		p.name, strings.Join(ingredients, ", "), strings.Join(products, ", "), p.time, sucessor, predecessors)
-	result += fmt.Sprintf("\nMINCOUNT: %d, COUNT: %d, INITIAL: %v, ACTIVITY NUMBER: %d, START: %d\n", p.minCount, p.count, p.initial, p.activityNumber, p.start)
-
-	return result
-}
+// 	return result
+// }
 
 // func (p process) strength() int {
 // 	n := p.count

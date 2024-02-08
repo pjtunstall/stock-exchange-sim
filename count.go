@@ -1,86 +1,64 @@
 package main
 
-func count(resources []resource, processes []process, goal goal) {
+func count(resources map[string]int, processes []process, goal goal) int {
+	finishedAt := 0
+	curr := make([]*process, 0, len(processes))
 	for i := range processes {
+		processes[i].count = processes[i].minCount.numerator
 		if processes[i].initial {
 			processes[i].start = 0
-			for j := range processes[i].ingredients {
-				for k := range resources {
-					if processes[i].ingredients[j].name == resources[k].name && resources[k].quantity > 0 && resources[k].quantity >= processes[i].ingredients[j].quantity {
-						resources[k].quantity -= processes[i].ingredients[j].quantity
-						processes[i].count = processes[i].minCount.numerator
-					}
-				}
-			}
+			processes[i].count = processes[i].minCount.numerator
+			curr = append(curr, &processes[i])
 		}
 	}
+
+	// Working on this bit. The idea is to calculate the ratios
+	// that each process can be performed in, given enough resources.
+	// Needs checking and needs logic to respect resource availability.
+	for i := range processes {
+		arr := make([]int, 0, len(processes))
+		for j := range processes {
+			arr = append(arr, processes[j].minCount.denominator)
+		}
+		processes[i].maxCount = lcm(arr)
+		processes[i].count = processes[i].minCount.Times(rational{processes[i].maxCount, 1}).numerator
+	}
+
+	for len(curr) > 0 {
+		next := make([]*process, 0, len(processes))
+		added := make(map[string]bool)
+		for i := range curr {
+			isSufficient := true
+			for _, ingredient := range curr[i].ingredients {
+				less := resources[ingredient.name] < ingredient.quantity*curr[i].count
+				if less || resources[ingredient.name] == 0 {
+					isSufficient = false
+				}
+			}
+			if !isSufficient {
+				continue
+			}
+			for _, ingredient := range curr[i].ingredients {
+				resources[ingredient.name] -= ingredient.quantity * curr[i].count
+			}
+			for _, product := range curr[i].products {
+				resources[product.name] += product.quantity * curr[i].count
+			}
+			if curr[i].successor != nil {
+				end := curr[i].start + curr[i].time
+				if end > curr[i].successor.start {
+					curr[i].successor.start = end
+				}
+				if !added[curr[i].successor.name] {
+					added[curr[i].successor.name] = true
+					next = append(next, curr[i].successor)
+				}
+			}
+			if curr[i].final {
+				finishedAt = curr[i].start + curr[i].time
+			}
+		}
+		curr = next
+	}
+	return finishedAt
 }
-
-// // Work in progress: count number of times each process must be run.
-// func count(resources []resource, processes []process, goal goal) {
-// 	curr := make([]*process, 0, 64)
-
-// 	// This map will be used to keep track of the remaining resources
-// 	// at each step, starting with initial resources, and at each step
-// 	// containing the products of the previous step.
-// 	rMap := make(map[string]int)
-// 	for i := range resources {
-// 		rMap[resources[i].name] = resources[i].quantity
-// 	}
-
-// 	// Seed the curr slice with the initial processes.
-// 	for i := range processes {
-// 		if processes[i].initial {
-// 			curr = append(curr, &processes[i])
-// 			processes[i].count = 1
-// 			for _, ingredient := range processes[i].ingredients {
-// 				rMap[ingredient.name] -= ingredient.quantity
-// 				if rMap[ingredient.name] == 0 {
-// 					delete(rMap, ingredient.name)
-// 				}
-// 				if rMap[ingredient.name] < 0 {
-// 					panic("insufficient resources")
-// 				}
-// 			}
-// 		}
-// 	}
-
-// 	// While there are processes to be run, decrement the resources
-// 	// and add the products to the next slice of processes to be run.
-// 	for len(curr) > 0 {
-// 		var next []*process
-// 		for k := range curr {
-// 			s := strength(curr[k])
-
-// 		}
-// 		// for len(rMap) > 0 {
-// 		// 	for k := range curr {
-// 		// 		for j := range curr[k].ingredients {
-// 		// 			rMap[curr[k].ingredients[j].name] -= curr[k].ingredients[j].quantity
-// 		// 			if rMap[curr[k].ingredients[j].name] <= 0 {
-// 		// 				delete(rMap, curr[k].ingredients[j].name)
-// 		// 			}
-// 		// 		}
-// 		// 		d := curr[k].minCount.Denominator
-// 		// 		if d > 1 {
-// 		// 			curr[k].count *= d
-// 		// 		}
-// 		// 		next = append(next, curr[k].successor)
-// 		// 	}
-// 		// }
-// 		curr = next
-// 	}
-// }
-
-// func min(a []int) (int, error) {
-// 	if len(a) == 0 {
-// 		return 0, fmt.Errorf("empty slice")
-// 	}
-// 	m := a[0]
-// 	for i := 1; i < len(a); i++ {
-// 		if a[i] < m {
-// 			m = a[i]
-// 		}
-// 	}
-// 	return m, nil
-// }

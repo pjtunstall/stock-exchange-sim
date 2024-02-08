@@ -50,7 +50,11 @@ After all that, neither scheme quite works for us, given the different underlyin
 
 Let's start with the simplifying assumption that, as in our examples, tasks can have multiple predecessors but only one sucessor.
 
-Let the count of a task be the number of times it's scheduled to be performed. Set all counts to zero initially. Also give each process a field minCount that will be used to initialize the count. minCount will be of a home-made type, rational, representing a rational number. Set minCount of a task to the product of the minCount's of all its direct and indirect successors.
+Let the count of a task be the number of times it's scheduled to be performed. Set all counts to zero initially. Also give each process a field minCount that will be used to initialize the count. minCount will be of a home-made type, rational, representing a rational number. Set minCount of a task to the product of the minCount's of all its direct and indirect successors, multiplied by the quantity its successor requires, and divided by the quantity of the item it produces that connects it to its successor. (This assumes that, if it's connected via multiple products, the ratios of how much is produced to how much needed are all the same.)
+
+...
+
+Make resources a map for ease of adding resources as they're created and deleting them as they're used up?
 
 ...
 
