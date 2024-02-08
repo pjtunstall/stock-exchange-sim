@@ -1,3 +1,13 @@
+TODO:
+
+- Check logic.
+- Refactor.
+- Deal with the cyclic case (renewable resources), as in fertilizer.
+  - This will need a somewhat different logic.
+- Write checker.
+- Create own finite example.
+- Create own infinite example.
+
 # stock-exchange-sim
 
 0. [Brief](#-brief)
@@ -51,6 +61,8 @@ A PARALLEL schedule generation scheme with N tasks takes at most N steps. At eac
 After all that, neither scheme quite works for us, given the different underlying assumptions of our project: multiple instances of a task schedulable, possibly simultaneously. But we can take inspiration from them.
 
 Let's start with the simplifying assumption that, as in our examples, tasks can have multiple predecessors but only one sucessor.
+
+...
 
 Let the count of a task be the number of times it's scheduled to be performed. Set all counts to zero initially. Also give each process a field minCount that will be used to initialize the count. minCount will be of a home-made type, rational, representing a rational number. Set minCount of a task to the product of the minCount's of all its direct and indirect successors, multiplied by the quantity its successor requires, and divided by the quantity of the item it produces that connects it to its successor. (This assumes that, if it's connected via multiple products, the ratios of how much is produced to how much needed are all the same.)
 
