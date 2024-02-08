@@ -24,6 +24,8 @@ type process struct {
 	maxCount       int
 	activityNumber int
 	start          int
+	iterations     int
+	doable         bool
 }
 
 type rational struct {

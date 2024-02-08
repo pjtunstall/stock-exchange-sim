@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 func count(resources map[string]int, processes []process, goal goal) int {
 	finishedAt := 0
 	curr := make([]*process, 0, len(processes))
@@ -8,13 +10,10 @@ func count(resources map[string]int, processes []process, goal goal) int {
 		if processes[i].initial {
 			processes[i].start = 0
 			processes[i].count = processes[i].minCount.numerator
-			curr = append(curr, &processes[i])
+			processes[i].doable = true
 		}
 	}
 
-	// Working on this bit. The idea is to calculate the ratios
-	// that each process can be performed in, given enough resources.
-	// Needs checking and needs logic to respect resource availability.
 	for i := range processes {
 		arr := make([]int, 0, len(processes))
 		for j := range processes {
@@ -24,41 +23,67 @@ func count(resources map[string]int, processes []process, goal goal) int {
 		processes[i].count = processes[i].minCount.Times(rational{processes[i].maxCount, 1}).numerator
 	}
 
-	for len(curr) > 0 {
-		next := make([]*process, 0, len(processes))
-		added := make(map[string]bool)
-		for i := range curr {
-			isSufficient := true
-			for _, ingredient := range curr[i].ingredients {
-				less := resources[ingredient.name] < ingredient.quantity*curr[i].count
-				if less || resources[ingredient.name] == 0 {
-					isSufficient = false
+	// k is a stopper to avoid infinite loops; adjust as needed
+	for k := 0; k < 100; k++ {
+		for i := range processes {
+			if processes[i].initial && processes[i].doable {
+				isSufficient := true
+				for _, ingredient := range processes[i].ingredients {
+					less := resources[ingredient.name] < ingredient.quantity*processes[i].count
+					if less || resources[ingredient.name] == 0 {
+						isSufficient = false
+					}
 				}
-			}
-			if !isSufficient {
-				continue
-			}
-			for _, ingredient := range curr[i].ingredients {
-				resources[ingredient.name] -= ingredient.quantity * curr[i].count
-			}
-			for _, product := range curr[i].products {
-				resources[product.name] += product.quantity * curr[i].count
-			}
-			if curr[i].successor != nil {
-				end := curr[i].start + curr[i].time
-				if end > curr[i].successor.start {
-					curr[i].successor.start = end
+				if !isSufficient {
+					processes[i].doable = false
+					continue
 				}
-				if !added[curr[i].successor.name] {
-					added[curr[i].successor.name] = true
-					next = append(next, curr[i].successor)
-				}
-			}
-			if curr[i].final {
-				finishedAt = curr[i].start + curr[i].time
+				curr = append(curr, &processes[i])
 			}
 		}
-		curr = next
+		if len(curr) == 0 {
+			break
+		}
+		for len(curr) > 0 {
+			next := make([]*process, 0, len(processes))
+			added := make(map[string]bool)
+
+			for i := range curr {
+				isSufficient := true
+				for _, ingredient := range curr[i].ingredients {
+					less := resources[ingredient.name] < ingredient.quantity*curr[i].count
+					if less || resources[ingredient.name] == 0 {
+						isSufficient = false
+					}
+				}
+				if !isSufficient {
+					continue
+				}
+				curr[i].iterations += curr[i].count
+				fmt.Println(curr[i].name, curr[i].count, curr[i].iterations)
+				for _, ingredient := range curr[i].ingredients {
+					resources[ingredient.name] -= ingredient.quantity * curr[i].count
+				}
+				for _, product := range curr[i].products {
+					resources[product.name] += product.quantity * curr[i].count
+				}
+				if curr[i].successor != nil {
+					end := curr[i].start + curr[i].time
+					if end > curr[i].successor.start {
+						curr[i].successor.start = end
+					}
+					if !added[curr[i].successor.name] {
+						added[curr[i].successor.name] = true
+						next = append(next, curr[i].successor)
+					}
+				}
+				if curr[i].final {
+					finishedAt = curr[i].start + curr[i].time
+				}
+
+			}
+			curr = next
+		}
 	}
 	return finishedAt
 }

@@ -11,7 +11,7 @@ func buildOutput(resources map[string]int, processes []process, end int) string 
 	for _, process := range processes {
 		for i := 0; i <= end; i++ {
 			if process.start == i {
-				for j := 0; j < process.count; j++ {
+				for j := 0; j < process.iterations; j++ {
 					builder.WriteString(fmt.Sprintf(" %d:%s\n", process.start, process.name))
 				}
 			}

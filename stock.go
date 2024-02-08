@@ -20,9 +20,7 @@ func main() {
 	buildNetwork(resources, processes, goal)
 	currentResources := make(map[string]int)
 	for i := range resources {
-		if resources[i].quantity > 0 {
-			currentResources[resources[i].name] = resources[i].quantity
-		}
+		currentResources[resources[i].name] = resources[i].quantity
 	}
 
 	// // Work in progress: count number of times each process must be run.
