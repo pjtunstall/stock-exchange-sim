@@ -1,12 +1,13 @@
 TODO:
 
-- Check logic.
+- Check logic as I document it.
 - Refactor.
 - Deal with the cyclic case (renewable resources), as in fertilizer.
   - This will need a somewhat different logic.
 - Write checker.
 - Create own finite example.
 - Create own infinite example.
+- Reinstate WriteOutput (and omit log to console).
 
 # stock-exchange-sim
 

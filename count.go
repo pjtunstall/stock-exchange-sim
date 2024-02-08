@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 func count(resources map[string]int, processes []process, goal goal) int {
 	finishedAt := 0
 	curr := make([]*process, 0, len(processes))
@@ -60,7 +58,6 @@ func count(resources map[string]int, processes []process, goal goal) int {
 					continue
 				}
 				curr[i].iterations += curr[i].count
-				fmt.Println(curr[i].name, curr[i].count, curr[i].iterations)
 				for _, ingredient := range curr[i].ingredients {
 					resources[ingredient.name] -= ingredient.quantity * curr[i].count
 				}

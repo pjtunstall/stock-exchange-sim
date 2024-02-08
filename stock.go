@@ -17,7 +17,7 @@ func main() {
 		log.Fatalf("error parsing file: %v", err)
 	}
 
-	buildNetwork(resources, processes, goal)
+	buildGraph(resources, processes, goal)
 	currentResources := make(map[string]int)
 	for i := range resources {
 		currentResources[resources[i].name] = resources[i].quantity
