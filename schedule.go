@@ -1,12 +1,19 @@
 package main
 
-func schedule(resources map[string]int, processes []process, goal goal, finite bool, c <-chan struct{}) int {
+import "fmt"
+
+func schedule(resources map[string]int, processes []process, goal goal, finite bool, c <-chan struct{}) (int, map[int][]string) {
 	finishedAt := 0
 	curr := make([]*process, 0, len(processes))
+	starts := make(map[int][]string)
+
 	for i := range processes {
 		processes[i].count = processes[i].minCount.numerator
 		if processes[i].initial {
 			processes[i].start = 0
+			if !finite {
+				processes[i].startInfinite = append(processes[i].startInfinite, 0)
+			}
 			processes[i].count = processes[i].minCount.numerator
 			processes[i].doable = true
 		}
@@ -24,11 +31,6 @@ func schedule(resources map[string]int, processes []process, goal goal, finite b
 	// Infinite loop limited by timer. See checkArgs() in stock.go
 	// for default timer value.
 	for {
-		select {
-		case <-c:
-			return finishedAt
-		default:
-		}
 		for i := range processes {
 			if processes[i].initial && processes[i].doable {
 				isSufficient := true
@@ -51,6 +53,12 @@ func schedule(resources map[string]int, processes []process, goal goal, finite b
 		}
 
 		for len(curr) > 0 {
+			fmt.Println("curr: ", curr[0].name)
+			select {
+			case <-c:
+				return finishedAt, starts
+			default:
+			}
 			next := make([]*process, 0, len(processes))
 			added := make(map[string]bool)
 
@@ -78,23 +86,53 @@ func schedule(resources map[string]int, processes []process, goal goal, finite b
 				}
 				if curr[i].successor != nil {
 					end := curr[i].start + curr[i].time
-					if end > curr[i].successor.start {
+					firstTime := len(curr[i].startInfinite) == 0
+					if (finite || firstTime) && end > curr[i].successor.start {
 						curr[i].successor.start = end
 					}
+					// Sheer chaos! Not working yet.
+					if !finite {
+						if len(curr[i].successor.startInfinite) == 0 {
+							end = curr[i].start + curr[i].time
+							curr[i].startInfinite = append(curr[i].startInfinite, end)
+						} else {
+							if len(curr[i].startInfinite) > 0 {
+								end = curr[i].startInfinite[len(curr[i].startInfinite)-1] + curr[i].time
+							} else {
+								end = curr[i].start + curr[i].time
+							}
+							if end > curr[i].successor.startInfinite[len(curr[i].successor.startInfinite)-1] {
+								curr[i].successor.startInfinite = append(curr[i].successor.startInfinite, end)
+							}
+						}
+					}
+					// End of chaos.
+					starts[end] = append(starts[end], curr[i].successor.name)
 					if !added[curr[i].successor.name] {
 						added[curr[i].successor.name] = true
 						next = append(next, curr[i].successor)
 					}
 				}
 
-				// Need to modify this for infinite case.
-				if curr[i].final {
+				if finite && curr[i].final {
 					finishedAt = curr[i].start + curr[i].time
 				}
-
+				if !finite {
+					finishedAt = maxTime(curr)
+				}
 			}
 			curr = next
 		}
 	}
-	return finishedAt
+	return finishedAt, starts
+}
+
+func maxTime(processes []*process) int {
+	max := 0
+	for i := range processes {
+		if processes[i].time > max {
+			max = processes[i].time
+		}
+	}
+	return max
 }

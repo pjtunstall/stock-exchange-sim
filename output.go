@@ -5,17 +5,26 @@ import (
 	"strings"
 )
 
-func buildOutput(resources map[string]int, processes []process, end int) string {
+func buildOutput(resources map[string]int, processes []process, end int, finite bool, starts map[int][]string) string {
 	var builder strings.Builder
 	builder.WriteString("Processes scheduled:\n")
 	var someScheduled bool
-	for _, process := range processes {
-		for i := 0; i <= end; i++ {
-			if process.start == i {
-				for j := 0; j < process.iterations; j++ {
-					someScheduled = true
-					builder.WriteString(fmt.Sprintf(" %d:%s\n", process.start, process.name))
+	if finite {
+		for _, process := range processes {
+			for i := 0; i <= end; i++ {
+				if process.start == i {
+					for j := 0; j < process.iterations; j++ {
+						someScheduled = true
+						builder.WriteString(fmt.Sprintf(" %d:%s\n", process.start, process.name))
+					}
 				}
+			}
+		}
+	} else {
+		for start := range starts {
+			for _, process := range starts[start] {
+				someScheduled = true
+				builder.WriteString(fmt.Sprintf(" %d:%s\n", start, process))
 			}
 		}
 	}

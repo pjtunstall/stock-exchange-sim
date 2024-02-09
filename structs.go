@@ -30,9 +30,10 @@ type process struct {
 	maxCount       int
 	activityNumber int
 	start          int
+	startInfinite  []int
 	iterations     int
 	doable         bool
-	added          bool
+	added          int
 }
 
 type rational struct {

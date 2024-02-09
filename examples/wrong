@@ -1,0 +1,23 @@
+attention:7
+
+stare_at_wall:(attention:4):(nothingness:1):18
+read_diamond_sutra:(attention:1):(insight:1):106
+chant:(attention:2):(cameradery:1):9
+attain_enlightenment:(nothingness:1;insight:1;cameradery:1):(enlightenment:1):1
+
+optimize:(time;enlightenment)
+
+# Processes scheduled:
+#  0:stare_at_wall
+#  0:read_diamond_sutra
+#  0:chant
+#  106:attain_enlightenment
+# No more process doable at cycle 108.
+# Stock left:
+#  attention:0
+#  nothingness:0
+#  insight:0
+#  cameradery:0
+#  enlightenment:1
+
+# That's no good.

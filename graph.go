@@ -24,7 +24,7 @@ func buildGraph(resources []resource, processes []process, g goal) bool {
 	for i := range processes {
 		for _, product := range processes[i].products {
 			if product.name == g.product {
-				processes[i].added = true
+				processes[i].added = 1
 				processes[i].final = true
 				processes[i].minCount = rational{numerator: 1, denominator: 1}
 				processes[i].activityNumber = activityNumber
@@ -32,12 +32,25 @@ func buildGraph(resources []resource, processes []process, g goal) bool {
 				curr = append(curr, &processes[i])
 			}
 		}
+		// For every ingredient, if there exists a resource with the same name and non-zero quantity at least as much,
+		// then the process is initial.
+		if len(processes[i].ingredients) > 0 {
+			processes[i].initial = true
+		}
 		for _, ingredient := range processes[i].ingredients {
+			if ingredient.name == "you" {
+				continue
+			}
+			found := false
 			for _, resource := range resources {
-				if ingredient.name == resource.name && resource.quantity > 0 && resource.quantity >= ingredient.quantity && ingredient.name != "you" {
-					processes[i].initial = true
-					continue
+				if ingredient.name == resource.name && resource.quantity > 0 && resource.quantity >= ingredient.quantity {
+					found = true
+					break
 				}
+			}
+			if !found {
+				processes[i].initial = false
+				break
 			}
 		}
 	}
@@ -53,10 +66,10 @@ func buildGraph(resources []resource, processes []process, g goal) bool {
 							if processes[i].name == curr[k].name || ingredient.name == "you" {
 								continue
 							}
-							if processes[i].added {
+							if processes[i].added > 1 {
 								return false
 							}
-							processes[i].added = true
+							processes[i].added++
 							processes[i].successor = curr[k]
 							r := rational{ingredient.quantity, 1}.Times(curr[k].minCount)
 							processes[i].minCount = r.Times(rational{1, product.quantity})

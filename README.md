@@ -1,3 +1,9 @@
+Back to the drawing board. My basic logic works on modifications of build where the initial processes all require one unit of a single primary resource, and their successor and end process requires different amounts of their products. But, it fails the other way around: when the initial processes require different amounts of the primary resource and the end process requires the same amout of each product.
+
+I've also yet to wrangle the infinite case into shape: fertilizer. I'm aiming to keep track of the start times in two ways, as a field startInfinite of the process struct, which is of type []int, and should list the start time of the process; and in a map that will be handy for building the output string.
+
+But the logic's not right yet.
+
 TODO:
 
 - Check logic as I document it.
@@ -7,13 +13,83 @@ TODO:
 - Write checker.
 - Create own finite example.
 - Create own infinite example.
-- Reinstate WriteOutput (and omit log to console).
+- Reinstate WriteOutput (and perhaps omit log to console).
+
+I need to represent start times by a []int for infinite projects, and adapt output accordingly. Initialize startInfinite for all initial projects to []int{0}. Yeah, we're doing that. Then when a process is scheduled, append to its startInfinite slice the maximum of its predecessors most recent finish times: i.e. their most recent start time + their time. And don't forget to change the output to actually print that!
+
+Where doe buildOutput get its end from when infinite?
+
+It's hard to interleave the processes to be printed if the start times are only stored in a slice as a field of the process structs. Could the information be stored in a communal variable, `starts`? How about doing it the other way around and storing start times as a `map[int][]string`?
+
+Maybe both. In `schedule`, we need to find the previous start time of a given process to calculate its next start time. In `buildOutput`, we need to get from start times to process names.
 
 At the moment, with hack of ignoring ingredient.name == "you", fertilizer creates the correct graph. "you" is distinguished by the fact that it's a product of multiple processes, indeed all processes. Restore ubik field and string.
 
-Tasks are not being scheduled in the infinite case, except for intial ones. I'll have to make sure that the counts are multiplied too many times, just once round in the loop. fertilizer is a special case because counts are all unit.
-
 I should restrict the definition of initial processes to those for which ALL their ingredients are among the initial resources.
+
+-
+
+Deal with this situation:
+
+attention:7
+
+stare_at_wall:(attention:1):(nothingness:1):15
+read_diamond_sutra:(attention:2):(insight:1):20
+chant:(attention:1):(cameradery:1):10
+attain_enlightenment:(nothingness:5;insight:1;cameradery:3):(enlightenment:1):30
+
+optimize:(time;enlightenment)
+
+It's not depleting nothingness, and it's producing enlightnment without insight. Or how about this?
+
+attention:7
+
+stare_at_wall:(attention:1):(nothingness:1):18
+read_diamond_sutra:(attention:2):(insight:1):108
+chant:(attention:3):(cameradery:1):9
+attain_enlightenment:(nothingness:2;insight:1;cameradery:3):(enlightenment:1):33
+
+optimize:(time;enlightenment)
+
+The result should be two stare_at_wall, one read_diamind_sutra, and one chant. Instead we get
+
+Processes scheduled:
+0:stare_at_wall
+0:stare_at_wall
+0:stare_at_wall
+0:stare_at_wall
+0:read_diamond_sutra
+No more process doable at cycle 1.
+Stock left:
+attention:1
+nothingness:4
+insight:1
+
+With requirements all 1 unit of attention, it works. Hmph, all wrong:
+
+attention:7
+
+stare_at_wall:(attention:4):(nothingness:1):18
+read_diamond_sutra:(attention:2):(insight:1):108
+chant:(attention:1):(cameradery:1):9
+attain_enlightenment:(nothingness:1;insight:1;cameradery:1):(enlightenment:1):33
+
+optimize:(time;enlightenment)
+
+Processes scheduled:
+0:stare_at_wall
+0:read_diamond_sutra
+0:chant
+108:attain_enlightenment
+No more process doable at cycle 142.
+Stock left:
+attention:0
+nothingness:0
+insight:0
+cameradery:0
+enlightenment:1
+
+All wrong!
 
 # stock-exchange-sim
 
@@ -77,15 +153,3 @@ Let's start with the simplifying assumption that, as in our examples, tasks can 
 ...
 
 Let the count of a task be the number of times it's scheduled to be performed. Set all counts to zero initially. Also give each process a field minCount that will be used to initialize the count. minCount will be of a home-made type, rational, representing a rational number. Set minCount of a task to the product of the minCount's of all its direct and indirect successors, multiplied by the quantity its successor requires, and divided by the quantity of the item it produces that connects it to its successor. (This assumes that, if it's connected via multiple products, the ratios of how much is produced to how much needed are all the same.)
-
-...
-
-Make resources a map for ease of adding resources as they're created and deleting them as they're used up?
-
-...
-
-Define the strength of a task as count times the number of units of target product (goal) it leads to per unit of resource it consumes. Assuming only essential tasks make it into the graph, we could increment a task's count till it reaches the minimum needed to make one unit of the end product. Repeat till the resources are all used up. Then mark current tasks as completed, increment resources if they're renewable, then move on to the next step.
-
-For example, in `build`, we'd set the count of doorknobs to 2, background to 1, and shelf to 3. Since 2 \* 1 + 1 \* 2 + 3 \* 1 = 7, and there are 7 boards, we stop there. Time doesn't matter as we can schedule tasks an unlimited amount of times at once, and the only resource is never replenished. We just need to note when the cabinet building starts and finishes.
-
-...

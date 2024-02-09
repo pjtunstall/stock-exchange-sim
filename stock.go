@@ -17,21 +17,21 @@ func main() {
 	}
 
 	finite := buildGraph(resources, processes, goal)
-	// printConfig(resources, processes, goal)
 	currentResources := make(map[string]int)
 	for i := range resources {
 		currentResources[resources[i].name] = resources[i].quantity
 	}
 
-	end := schedule(currentResources, processes, goal, finite, c)
+	end, starts := schedule(currentResources, processes, goal, finite, c)
 	printConfig(resources, processes, goal)
-	s := buildOutput(currentResources, processes, end)
+	s := buildOutput(currentResources, processes, end, finite, starts)
 	fmt.Println()
 	fmt.Println(s)
 	// writeOutput(s)
 }
 
 func checkArgs() float64 {
+	// Default waiting time: 1 second
 	f := 1.0
 	if len(os.Args) > 3 {
 		log.Println("too many arguments")
