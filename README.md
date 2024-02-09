@@ -9,6 +9,12 @@ TODO:
 - Create own infinite example.
 - Reinstate WriteOutput (and omit log to console).
 
+At the moment, with hack of ignoring ingredient.name == "you", fertilizer creates the correct graph. "you" is distinguished by the fact that it's a product of multiple processes, indeed all processes. Restore ubik field and string.
+
+Tasks are not being scheduled in the infinite case, except for intial ones. I'll have to make sure that the counts are multiplied too many times, just once round in the loop. fertilizer is a special case because counts are all unit.
+
+I should restrict the definition of initial processes to those for which ALL their ingredients are among the initial resources.
+
 # stock-exchange-sim
 
 0. [Brief](#-brief)

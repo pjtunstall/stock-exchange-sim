@@ -1,16 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
+	"strconv"
 )
 
 func main() {
-	checkArgs()
-
-	if len(os.Args) == 3 {
-		setTimer()
-	}
+	c := make(chan struct{})
+	setTimer(checkArgs(), c)
 
 	resources, processes, goal, err := parseFile("./" + os.Args[1])
 	if err != nil {
@@ -18,36 +17,22 @@ func main() {
 	}
 
 	finite := buildGraph(resources, processes, goal)
+	// printConfig(resources, processes, goal)
 	currentResources := make(map[string]int)
 	for i := range resources {
 		currentResources[resources[i].name] = resources[i].quantity
 	}
 
-	end := schedule(currentResources, processes, goal, finite)
-	_ = buildOutput(currentResources, processes, end)
+	end := schedule(currentResources, processes, goal, finite, c)
+	printConfig(resources, processes, goal)
+	s := buildOutput(currentResources, processes, end)
+	fmt.Println()
+	fmt.Println(s)
 	// writeOutput(s)
-
-	// fmt.Println("\nResources:")
-	// for _, r := range resources {
-	// 	fmt.Println(r.string())
-	// }
-	// fmt.Println()
-
-	// fmt.Println("\nProcesses:")
-	// for _, p := range processes {
-	// 	fmt.Println(p.string())
-	// }
-
-	// fmt.Println("\nOptimize:")
-	// fmt.Println(goal.string())
-	// fmt.Println()
-
-	// for resource, quantity := range currentResources {
-	// 	fmt.Println(resource, quantity)
-	// }
 }
 
-func checkArgs() {
+func checkArgs() float64 {
+	f := 1.0
 	if len(os.Args) > 3 {
 		log.Println("too many arguments")
 		log.Fatal("usage: ./stock <file> <waiting_time>")
@@ -56,4 +41,29 @@ func checkArgs() {
 		log.Println("not enough arguments")
 		log.Fatal("usage: ./stock <file> <waiting_time>")
 	}
+	if len(os.Args) == 3 {
+		g, err := strconv.ParseFloat(os.Args[2], 64)
+		if err != nil {
+			log.Fatalf("error parsing wait time: %v", err)
+		}
+		f = g
+	}
+	return f
+}
+
+func printConfig(resources []resource, processes []process, goal goal) {
+	fmt.Println("\nResources:")
+	for _, r := range resources {
+		fmt.Println(r.string())
+	}
+	fmt.Println()
+
+	fmt.Println("\nProcesses:")
+	for _, p := range processes {
+		fmt.Println(p.string())
+	}
+
+	fmt.Println("\nOptimize:")
+	fmt.Println(goal.string())
+	fmt.Println()
 }

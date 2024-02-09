@@ -88,7 +88,7 @@ func parseResource(s string) (resource, error) {
 	if err != nil {
 		return resource{}, fmt.Errorf("invalid resource: %s", s)
 	}
-	return resource{name, quantity}, nil
+	return resource{name, quantity, true}, nil
 }
 
 func parseGoal(s string) (goal, error) {

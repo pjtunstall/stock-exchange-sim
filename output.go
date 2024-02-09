@@ -7,24 +7,27 @@ import (
 
 func buildOutput(resources map[string]int, processes []process, end int) string {
 	var builder strings.Builder
-	builder.WriteString("Main Processes:\n")
+	builder.WriteString("Processes scheduled:\n")
+	var someScheduled bool
 	for _, process := range processes {
 		for i := 0; i <= end; i++ {
 			if process.start == i {
 				for j := 0; j < process.iterations; j++ {
+					someScheduled = true
 					builder.WriteString(fmt.Sprintf(" %d:%s\n", process.start, process.name))
 				}
 			}
 		}
 	}
-	builder.WriteString(fmt.Sprintf("No more process doable at cycle %d\n", end+1))
-	builder.WriteString("Stock:\n")
+	if !someScheduled {
+		builder.WriteString(" none\n")
+	}
+	builder.WriteString(fmt.Sprintf("No more process doable at cycle %d.\n", end+1))
+	builder.WriteString("Stock left:\n")
 	for resource, quantity := range resources {
 		builder.WriteString(fmt.Sprintf(" %s:%d\n", resource, quantity))
 	}
 	s := builder.String()
-	fmt.Println()
-	fmt.Println(s)
 	return s
 }
 

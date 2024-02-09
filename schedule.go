@@ -1,18 +1,6 @@
 package main
 
-func schedule(resources map[string]int, processes []process, goal goal, finite bool) int {
-	if finite {
-		return acyclic(resources, processes, goal)
-	}
-	return cyclic(resources, processes, goal)
-}
-
-// TODO
-func cyclic(resources map[string]int, processes []process, goal goal) int {
-	return 0
-}
-
-func acyclic(resources map[string]int, processes []process, goal goal) int {
+func schedule(resources map[string]int, processes []process, goal goal, finite bool, c <-chan struct{}) int {
 	finishedAt := 0
 	curr := make([]*process, 0, len(processes))
 	for i := range processes {
@@ -33,10 +21,14 @@ func acyclic(resources map[string]int, processes []process, goal goal) int {
 		processes[i].count = processes[i].minCount.Times(rational{processes[i].maxCount, 1}).numerator
 	}
 
-	// k is a stopper to avoid infinite loops; adjust as needed
-	// Better, given how the audit does it:
-	// replace with a default value for the timer.
-	for k := 0; k < 100; k++ {
+	// Infinite loop limited by timer. See checkArgs() in stock.go
+	// for default timer value.
+	for {
+		select {
+		case <-c:
+			return finishedAt
+		default:
+		}
 		for i := range processes {
 			if processes[i].initial && processes[i].doable {
 				isSufficient := true
@@ -53,9 +45,11 @@ func acyclic(resources map[string]int, processes []process, goal goal) int {
 				curr = append(curr, &processes[i])
 			}
 		}
+
 		if len(curr) == 0 {
 			break
 		}
+
 		for len(curr) > 0 {
 			next := make([]*process, 0, len(processes))
 			added := make(map[string]bool)
@@ -73,10 +67,14 @@ func acyclic(resources map[string]int, processes []process, goal goal) int {
 				}
 				curr[i].iterations += curr[i].count
 				for _, ingredient := range curr[i].ingredients {
-					resources[ingredient.name] -= ingredient.quantity * curr[i].count
+					if ingredient.name != "you" {
+						resources[ingredient.name] -= ingredient.quantity * curr[i].count
+					}
 				}
 				for _, product := range curr[i].products {
-					resources[product.name] += product.quantity * curr[i].count
+					if product.name != "you" {
+						resources[product.name] += product.quantity * curr[i].count
+					}
 				}
 				if curr[i].successor != nil {
 					end := curr[i].start + curr[i].time
@@ -88,6 +86,8 @@ func acyclic(resources map[string]int, processes []process, goal goal) int {
 						next = append(next, curr[i].successor)
 					}
 				}
+
+				// Need to modify this for infinite case.
 				if curr[i].final {
 					finishedAt = curr[i].start + curr[i].time
 				}

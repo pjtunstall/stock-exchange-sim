@@ -34,7 +34,7 @@ func buildGraph(resources []resource, processes []process, g goal) bool {
 		}
 		for _, ingredient := range processes[i].ingredients {
 			for _, resource := range resources {
-				if ingredient.name == resource.name && resource.quantity > 0 && resource.quantity >= ingredient.quantity {
+				if ingredient.name == resource.name && resource.quantity > 0 && resource.quantity >= ingredient.quantity && ingredient.name != "you" {
 					processes[i].initial = true
 					continue
 				}
@@ -50,6 +50,9 @@ func buildGraph(resources []resource, processes []process, g goal) bool {
 				for i := range processes {
 					for _, product := range processes[i].products {
 						if ingredient.name == product.name {
+							if processes[i].name == curr[k].name || ingredient.name == "you" {
+								continue
+							}
 							if processes[i].added {
 								return false
 							}
@@ -59,7 +62,9 @@ func buildGraph(resources []resource, processes []process, g goal) bool {
 							processes[i].minCount = r.Times(rational{1, product.quantity})
 							processes[i].activityNumber = activityNumber
 							activityNumber--
-							curr[k].predecessors = append(curr[k].predecessors, &processes[i])
+							if len(curr[k].predecessors) == 0 || curr[k].predecessors[0].name != processes[i].name {
+								curr[k].predecessors = append(curr[k].predecessors, &processes[i])
+							}
 							next = append(next, &processes[i])
 						}
 					}
