@@ -1,6 +1,18 @@
 package main
 
-func count(resources map[string]int, processes []process, goal goal) int {
+func schedule(resources map[string]int, processes []process, goal goal, finite bool) int {
+	if finite {
+		return acyclic(resources, processes, goal)
+	}
+	return cyclic(resources, processes, goal)
+}
+
+// TODO
+func cyclic(resources map[string]int, processes []process, goal goal) int {
+	return 0
+}
+
+func acyclic(resources map[string]int, processes []process, goal goal) int {
 	finishedAt := 0
 	curr := make([]*process, 0, len(processes))
 	for i := range processes {
@@ -22,6 +34,8 @@ func count(resources map[string]int, processes []process, goal goal) int {
 	}
 
 	// k is a stopper to avoid infinite loops; adjust as needed
+	// Better, given how the audit does it:
+	// replace with a default value for the timer.
 	for k := 0; k < 100; k++ {
 		for i := range processes {
 			if processes[i].initial && processes[i].doable {

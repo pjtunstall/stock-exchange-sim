@@ -26,6 +26,7 @@ type process struct {
 	start          int
 	iterations     int
 	doable         bool
+	added          bool
 }
 
 type rational struct {

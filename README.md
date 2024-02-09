@@ -14,8 +14,9 @@ TODO:
 0. [Brief](#-brief)
 1. [Setup](#1-setup)
 2. [Usage](#2-usage)
-3. [Research](#3-research)
-4. [Strategy](#4-strategy)
+3. [Audit](#3-audit)
+4. [Research](#3-research)
+5. [Strategy](#4-strategy)
 
 ## 0. Brief
 
@@ -41,7 +42,11 @@ Run `go . simple.txt` (or, after building an executable, `./stock simple.txt`) t
 
 Run `go . simple.txt 10` to specify that the program should not take longer than 10 seconds.
 
-## 3. Research
+## 3. Audit
+
+Exact outputs may vary from those suggested in the audit questions, especially where time is not to be optimized, since then there is less constraint on how soon they can be scheduled. Thus, for `seller`, the audit suggestion takes a more leisurely approach, whereas our program schedules processes as soon as the precedence relations allow.
+
+## 4. Research
 
 As recommended, we consulted [PM Knowledge Center](https://www.pmknowledgecenter.com), a collection of resources on "Project Management and Dynamic Scheduling". We found further background reading necessary to fill in the gaps in the explanations there: in particular, [Kolisch (1994)](https://www.econstor.eu/bitstream/10419/155418/1/manuskript_344.pdf). These sources describe what's known as a Resource Constrained Project Scheduling Problem. The heuristic type of solution our instructions direct us towards is called Priority Rule Based Scheduling.
 
@@ -57,7 +62,7 @@ A SERIAL schedule generation scheme with N tasks takes N steps. One task is chos
 
 A PARALLEL schedule generation scheme with N tasks takes at most N steps. At each step, we schedule zero or more activities. Tasks are partitioned into completed, in progress, and available. The schedule time associated with a step is calculated as the earliest completion time of the tasks that were in progress during the previous step. Tasks whose finish time is equal to the schedule time are moved from the set of tasks in progress to the set of completed tasks. This may make other tasks available. As long as tasks are available, they're chosen one by one, in order as in a serial scheme, and started at the current schedule time, then we move on to the next step. The algorithm terminates when all tasks are completed or in progress.
 
-## 4. Strategy
+## 5. Strategy
 
 After all that, neither scheme quite works for us, given the different underlying assumptions of our project: multiple instances of a task schedulable, possibly simultaneously. But we can take inspiration from them.
 

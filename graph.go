@@ -1,6 +1,6 @@
 package main
 
-func buildGraph(resources []resource, processes []process, g goal) {
+func buildGraph(resources []resource, processes []process, g goal) bool {
 	var curr []*process
 
 	// Maximum number of predecessors for a process. Adjust as needed.
@@ -24,6 +24,7 @@ func buildGraph(resources []resource, processes []process, g goal) {
 	for i := range processes {
 		for _, product := range processes[i].products {
 			if product.name == g.product {
+				processes[i].added = true
 				processes[i].final = true
 				processes[i].minCount = rational{numerator: 1, denominator: 1}
 				processes[i].activityNumber = activityNumber
@@ -49,6 +50,10 @@ func buildGraph(resources []resource, processes []process, g goal) {
 				for i := range processes {
 					for _, product := range processes[i].products {
 						if ingredient.name == product.name {
+							if processes[i].added {
+								return false
+							}
+							processes[i].added = true
 							processes[i].successor = curr[k]
 							r := rational{ingredient.quantity, 1}.Times(curr[k].minCount)
 							processes[i].minCount = r.Times(rational{1, product.quantity})
@@ -63,4 +68,5 @@ func buildGraph(resources []resource, processes []process, g goal) {
 		}
 		curr = next
 	}
+	return true
 }

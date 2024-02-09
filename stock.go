@@ -17,14 +17,13 @@ func main() {
 		log.Fatalf("error parsing file: %v", err)
 	}
 
-	buildGraph(resources, processes, goal)
+	finite := buildGraph(resources, processes, goal)
 	currentResources := make(map[string]int)
 	for i := range resources {
 		currentResources[resources[i].name] = resources[i].quantity
 	}
 
-	// // Work in progress: count number of times each process must be run.
-	end := count(currentResources, processes, goal)
+	end := schedule(currentResources, processes, goal, finite)
 	_ = buildOutput(currentResources, processes, end)
 	// writeOutput(s)
 
