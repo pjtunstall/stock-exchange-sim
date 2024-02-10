@@ -1,11 +1,16 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
-func schedule(resources map[string]int, processes []process, goal goal, finite bool, c <-chan struct{}) (int, map[int][]string) {
+func schedule(resources map[string]int, processes []process, goal goal, finite bool, c <-chan struct{}) (int, map[int][]string, string) {
 	finishedAt := 0
 	curr := make([]*process, 0, len(processes))
 	starts := make(map[int][]string)
+	var builder strings.Builder
+	pass := 0
 
 	for i := range processes {
 		processes[i].count = processes[i].minCount.numerator
@@ -13,6 +18,7 @@ func schedule(resources map[string]int, processes []process, goal goal, finite b
 			processes[i].start = 0
 			if !finite {
 				processes[i].startInfinite = append(processes[i].startInfinite, 0)
+				starts[0] = append(starts[0], processes[i].name)
 			}
 			processes[i].count = processes[i].minCount.numerator
 			processes[i].doable = true
@@ -30,7 +36,8 @@ func schedule(resources map[string]int, processes []process, goal goal, finite b
 
 	// Infinite loop limited by timer. See checkArgs() in stock.go
 	// for default timer value.
-	for {
+pass:
+	for ; ; pass++ {
 		for i := range processes {
 			if processes[i].initial && processes[i].doable {
 				isSufficient := true
@@ -53,10 +60,9 @@ func schedule(resources map[string]int, processes []process, goal goal, finite b
 		}
 
 		for len(curr) > 0 {
-			fmt.Println("curr: ", curr[0].name)
 			select {
 			case <-c:
-				return finishedAt, starts
+				return finishedAt, starts, builder.String()
 			default:
 			}
 			next := make([]*process, 0, len(processes))
@@ -86,28 +92,16 @@ func schedule(resources map[string]int, processes []process, goal goal, finite b
 				}
 				if curr[i].successor != nil {
 					end := curr[i].start + curr[i].time
-					firstTime := len(curr[i].startInfinite) == 0
-					if (finite || firstTime) && end > curr[i].successor.start {
+					if end > curr[i].successor.start {
 						curr[i].successor.start = end
+						curr[i].successor.startInfinite = append(curr[i].successor.startInfinite, pass*end)
 					}
-					// Sheer chaos! Not working yet.
-					if !finite {
-						if len(curr[i].successor.startInfinite) == 0 {
-							end = curr[i].start + curr[i].time
-							curr[i].startInfinite = append(curr[i].startInfinite, end)
-						} else {
-							if len(curr[i].startInfinite) > 0 {
-								end = curr[i].startInfinite[len(curr[i].startInfinite)-1] + curr[i].time
-							} else {
-								end = curr[i].start + curr[i].time
-							}
-							if end > curr[i].successor.startInfinite[len(curr[i].successor.startInfinite)-1] {
-								curr[i].successor.startInfinite = append(curr[i].successor.startInfinite, end)
-							}
-						}
+					starts[pass*end] = append(starts[pass*end], curr[i].successor.name)
+					builder.WriteString(fmt.Sprintf(" %d:%s\n", curr[i].start, curr[i].name))
+					if !finite && curr[i].successor.initial {
+						curr = []*process{}
+						continue pass
 					}
-					// End of chaos.
-					starts[end] = append(starts[end], curr[i].successor.name)
 					if !added[curr[i].successor.name] {
 						added[curr[i].successor.name] = true
 						next = append(next, curr[i].successor)
@@ -118,13 +112,13 @@ func schedule(resources map[string]int, processes []process, goal goal, finite b
 					finishedAt = curr[i].start + curr[i].time
 				}
 				if !finite {
-					finishedAt = maxTime(curr)
+					finishedAt = curr[i].start + maxTime(curr)
 				}
 			}
 			curr = next
 		}
 	}
-	return finishedAt, starts
+	return finishedAt, starts, builder.String()
 }
 
 func maxTime(processes []*process) int {

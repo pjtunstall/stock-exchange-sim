@@ -1,27 +1,15 @@
-Wrangle the infinite case into shape: fertilizer. I'm aiming to keep track of the start times in two ways, as a field startInfinite of the process struct, which is of type []int, and should list the start time of the process; and in a map that will be handy for building the output string.
-
 TODO:
 
 - Check logic as I document it.
 - Refactor.
-- Deal with the cyclic case (renewable resources), as in fertilizer.
-  - This will need a somewhat different logic.
 - Write checker.
 - Create own finite example.
-- Create own infinite example.
-- Reinstate WriteOutput (and perhaps omit log to console).
+- Create more complex own infinite example.
+- Reinstate WriteOutput (and perhaps omit log to console, or maybe not; it's convenient and shows the end of what might be a very long file; at the audit, I should explain that the final printout should not count as part of the program time; include a note in the README to that effect).
 
-I need to represent start times by a []int for infinite projects, and adapt output accordingly. Initialize startInfinite for all initial projects to []int{0}. Yeah, we're doing that. Then when a process is scheduled, append to its startInfinite slice the maximum of its predecessors most recent finish times: i.e. their most recent start time + their time. And don't forget to change the output to actually print that!
+- At the moment, with hack of ignoring ingredient.name == "you", fertilizer creates the correct graph. "you" is distinguished by the fact that it's a product of multiple processes, indeed all processes. Restore ubik field and string.
 
-Where doe buildOutput get its end from when infinite?
-
-It's hard to interleave the processes to be printed if the start times are only stored in a slice as a field of the process structs. Could the information be stored in a communal variable, `starts`? How about doing it the other way around and storing start times as a `map[int][]string`?
-
-Maybe both. In `schedule`, we need to find the previous start time of a given process to calculate its next start time. In `buildOutput`, we need to get from start times to process names.
-
-At the moment, with hack of ignoring ingredient.name == "you", fertilizer creates the correct graph. "you" is distinguished by the fact that it's a product of multiple processes, indeed all processes. Restore ubik field and string.
-
-I should restrict the definition of initial processes to those for which ALL their ingredients are among the initial resources.
+- I should restrict the definition of initial processes to those for which ALL their ingredients are among the initial resources.
 
 # stock-exchange-sim
 
@@ -46,7 +34,7 @@ The second argument is an integer representing the maximum number of seconds the
 
 There are two types of task: those that can continue indefinitely thanks to renewable resources, and those that have a finite objective. (Given that the number of instances of a task that can be scheduled at once is only limited by resources and precedence relations, time optimization would seem to only trivially relevant when resources are not renewable.)
 
-Given a configuration file `build.txt`, our program, `stock`, should produce a text file `build.log`, consisting of a schedule: a list of processes (possibly including several instances of the same process, possibly overlapping), an integer one unit greater than the duration of whole project, and a list of resources and products left at the end.
+Given a configuration file `build.txt`, our program, `stock`, should produce a text file `build.log`, consisting of a schedule: a list of processes (possibly including several instances of the same process, possibly overlapping), the statement "No more process duable at", followed by an integer one unit greater than the duration of whole project, and a list of stock (resources and products) left at the end.
 
 ## 1. Setup
 
@@ -58,7 +46,9 @@ Run `go . simple.txt 10` to specify that the program should not take longer than
 
 ## 3. Audit
 
-Exact outputs may vary from those suggested in the audit questions, especially where time is not to be optimized, since then there is less constraint on how soon they can be scheduled. Thus, for `seller`, the audit suggestion takes a more leisurely approach, whereas our program schedules processes as soon as the precedence relations allow.
+Exact outputs may vary from those suggested in the audit questions, especially where time is not to be optimized, since then there is less constraint on how soon they can be scheduled. Thus, for `seller`, the audit suggestion takes a more leisurely approach, whereas our program schedules processes as soon as the precedence relations allow, because why not?
+
+For me, 0.0007 is a good wait time for looking at `fertilizer`. Your milage may vary. Try it a few times, as the exact number of iterations can vary. It's a fine line between no cycles and hundreds of them.
 
 ## 4. Research
 

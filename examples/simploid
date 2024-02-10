@@ -1,7 +1,0 @@
-euro:3
-
-buy_materiel:(euro:1):(materiel:1):10
-build_product:(materiel:1):(product:1):30
-delivery:(product:2):(client_content:1):20
-
-optimize:(time;client_content)

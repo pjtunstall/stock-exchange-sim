@@ -22,9 +22,9 @@ func main() {
 		currentResources[resources[i].name] = resources[i].quantity
 	}
 
-	end, starts := schedule(currentResources, processes, goal, finite, c)
-	printConfig(resources, processes, goal)
-	s := buildOutput(currentResources, processes, end, finite, starts)
+	end, starts, t := schedule(currentResources, processes, goal, finite, c)
+	// printConfig(resources, processes, goal)
+	s := buildOutput(currentResources, processes, end, finite, starts, t)
 	fmt.Println()
 	fmt.Println(s)
 	// writeOutput(s)
@@ -51,19 +51,19 @@ func checkArgs() float64 {
 	return f
 }
 
-func printConfig(resources []resource, processes []process, goal goal) {
-	fmt.Println("\nResources:")
-	for _, r := range resources {
-		fmt.Println(r.string())
-	}
-	fmt.Println()
+// func printConfig(resources []resource, processes []process, goal goal) {
+// 	fmt.Println("\nResources:")
+// 	for _, r := range resources {
+// 		fmt.Println(r.string())
+// 	}
+// 	fmt.Println()
 
-	fmt.Println("\nProcesses:")
-	for _, p := range processes {
-		fmt.Println(p.string())
-	}
+// 	fmt.Println("\nProcesses:")
+// 	for _, p := range processes {
+// 		fmt.Println(p.string())
+// 	}
 
-	fmt.Println("\nOptimize:")
-	fmt.Println(goal.string())
-	fmt.Println()
-}
+// 	fmt.Println("\nOptimize:")
+// 	fmt.Println(goal.string())
+// 	fmt.Println()
+// }

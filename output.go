@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func buildOutput(resources map[string]int, processes []process, end int, finite bool, starts map[int][]string) string {
+func buildOutput(resources map[string]int, processes []process, end int, finite bool, starts map[int][]string, t string) string {
 	var builder strings.Builder
 	builder.WriteString("Processes scheduled:\n")
 	var someScheduled bool
@@ -21,12 +21,25 @@ func buildOutput(resources map[string]int, processes []process, end int, finite 
 			}
 		}
 	} else {
-		for start := range starts {
-			for _, process := range starts[start] {
-				someScheduled = true
-				builder.WriteString(fmt.Sprintf(" %d:%s\n", start, process))
-			}
+		builder.WriteString(t)
+		if len(t) > 0 {
+			someScheduled = true
 		}
+		// for i := 0; i <= 11; i++ {
+		// 	if _, ok := starts[i]; ok {
+		// 		for _, process := range starts[i] {
+		// 			someScheduled = true
+		// 			builder.WriteString(fmt.Sprintf(" %d:%s\n", i, process))
+		// 		}
+		// 	}
+		// }
+		//
+		// for start := range starts {
+		// 	for _, process := range starts[start] {
+		// 		someScheduled = true
+		// 		builder.WriteString(fmt.Sprintf(" %d:%s\n", start, process))
+		// 	}
+		// }
 	}
 	if !someScheduled {
 		builder.WriteString(" none\n")
