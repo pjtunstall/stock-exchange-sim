@@ -9,6 +9,7 @@ import (
 
 func main() {
 	c := make(chan struct{})
+	setTimer(checkArgs(), c)
 
 	resources, processes, goal, err := parseFile("./" + os.Args[1])
 	if err != nil {
@@ -21,8 +22,6 @@ func main() {
 	for i := range resources {
 		currentResources[resources[i].name] = resources[i].quantity
 	}
-
-	setTimer(checkArgs(), c)
 
 	end, t := schedule(currentResources, processes, goal, finite, c, ubik)
 	// printConfig(resources, processes, goal)

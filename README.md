@@ -1,9 +1,10 @@
 TODO:
 
 - Write checker.
-- Check logic as I document it.
-- Refactor: trim process struct, neaten buildOutput, schedule, and graph.
 - Reinstate WriteOutput (and perhaps omit log to console, or maybe not; it's convenient and shows the end of what might be a very long file; at the audit, I should explain that the final printout should not count as part of the program time; include a note in the README to that effect).
+
+- Refactor: trim process struct, neaten buildOutput, schedule, and graph.
+- Scrutinize logic.
 
 # stock-exchange-sim
 
@@ -40,17 +41,19 @@ Run `go . simple.txt` (or, after building an executable, `./stock examples/simpl
 
 Run `go . simple 10` to specify that the program should not take longer than 10 seconds.
 
-Please note that we've chosen to interpret the time parameter as the execution of the actual schedule function, not including initial set-up of precedence relations, or writing the output file and printing the result to the terminal. This seemed like a more natural comparison, particularly as printing to the terminal is an optional extra for ease of viewing long outputs. It has no bearing on the result of the audit.
-
 ## 3. Audit
 
+You'll find the configuration files and logs for the given examples in the `examples` folder, together with the two examples we were required to create: `zen` (finite) and `matryushka` (infinite).
+
 Exact outputs may vary from those suggested in the audit questions, especially where time is not to be optimized, since then there is less constraint on how soon they can be scheduled. Thus, for `seller`, the audit suggestion takes a more leisurely approach, whereas our program schedules processes as soon as the precedence relations allow, because why not?
+
+Please note that we've chosen to interpret the time parameter as marking when to end the schedule function. Writing the output file and printing the result to the terminal happen after that. This seemed like the most natural interpretation of the instructions, particularly as printing to the terminal is an optional extra for ease of viewing long outputs. It has no bearing on the result of the audit, which just asks you to confirm that fewer processes are performed in 0.003s than 1s for the example `fertilizer`.
 
 ## 4. Research
 
 As recommended, we consulted [PM Knowledge Center](https://www.pmknowledgecenter.com), a collection of resources on "Project Management and Dynamic Scheduling". We found further background reading necessary to fill in the gaps in the explanations there: in particular, [Kolisch (1994)](https://www.econstor.eu/bitstream/10419/155418/1/manuskript_344.pdf). These sources describe what's known as a Resource Constrained Project Scheduling Problem. The heuristic type of solution our instructions direct us towards is called Priority Rule Based Scheduling.
 
-Before going into detail, we should note that the above sources (or Kolish, at least, who gives more detailed algorithms) assume that each task can only be performed once per project, whereas our program is expected to deal with cases where tasks can and should be performed more than once (in succession or simultaneously), if resorces allow, to optimize what needs optimizing.
+Before going into detail, we should note that the above sources (or Kolish, at least, who gives more detailed algorithms) assume that each task can only be performed once per project, whereas our program is expected to deal with cases where tasks can and should be performed more than once (in succession or simultaneously), if resorces allow, to optimize what needs optimizing. This meant that we couldn't directly apply either of the proposed scheduling methods.
 
 In Priority Rule Based Scheduling, a graph of precedence relationships is drawn up: that is, a graph where tasks are nodes, and a directed edge from A to B means that commencement of B depends directly on completion of A. Activities are numbered in such a way that successors always have a greater activity number than their predecessors. A priority rule is chosen. Then a schedule is generated according to one of two schemes:
 
@@ -66,8 +69,12 @@ A PARALLEL schedule generation scheme with N tasks takes at most N steps. At eac
 
 After all that, neither scheme quite works for us, given the different underlying assumptions of our project: multiple instances of a task schedulable, possibly simultaneously. But we can take inspiration from them.
 
-Let's start with the simplifying assumption that, as in our examples, tasks can have multiple predecessors but only one sucessor.
+We start with the simplifying assumption that, as in our examples, tasks can have multiple predecessors but only one sucessor. We also make some "good faith" assumptions about the configuration file, such as the absence of processes that don't contribute towards the goal. A more robust scheme would need to deal with such cases.
 
-...
+For a finite project, let the `count` of a task be the number of times it's scheduled to be performed. For a project that is infinite, due to renewable resourses, the `count` of a task will be the number of times it's scheduled to be performed per iteration of a loop that runs till interupted by a signal from the timer.
 
-Let the count of a task be the number of times it's scheduled to be performed. Set all counts to zero initially. Also give each process a field minCount that will be used to initialize the count. minCount will be of a home-made type, rational, representing a rational number. Set minCount of a task to the product of the minCount's of all its direct and indirect successors, multiplied by the quantity its successor requires, and divided by the quantity of the item it produces that connects it to its successor. (This assumes that, if it's connected via multiple products, the ratios of how much is produced to how much needed are all the same.)
+Set all `count`s to zero initially. Also give each process a field `minCount` that will be used to initialize the count. `minCount` will be of a home-made type, rational, representing a rational number. Set the `minCount` of each task to 1 initially. Then procede backwards from final tasks (defined as those that directly produce the target item) to initial ones (those that can be performed immediately). At each iteration, identify predecessors and successors, and set the `minCount` of a process equal to the `minCount` of its successor times the quantity that its successor needs of the item by which they're linked, divided by the quantity that it produces of that item.
+
+Now, define `maxCount` as the least common multiple of the denominators of all the `minCount`s, and set the `count` of a process equal to the numerator of `maxCount` times its `minCount`.
+
+At each stage of scheduling, we check whether a process can be performed `count` number of times, given the resources. If not, it can't be scheduled. If so, schedule it as soon as possible, given the durations and start times of its precursors. For finite projects, the end time is the start time of the final process plus its duration. For cycling projects, the provisional end time is continually updated as tasks are scheduled, and returned along with the schedule when the timer signals to finish.

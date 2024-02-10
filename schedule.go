@@ -20,13 +20,13 @@ func schedule(resources map[string]int, processes []process, goal goal, finite b
 		}
 	}
 
+	arr := make([]int, 0, len(processes))
+	for j := range processes {
+		arr = append(arr, processes[j].minCount.denominator)
+	}
+	maxCount := lcm(arr)
 	for i := range processes {
-		arr := make([]int, 0, len(processes))
-		for j := range processes {
-			arr = append(arr, processes[j].minCount.denominator)
-		}
-		processes[i].maxCount = lcm(arr)
-		processes[i].count = processes[i].minCount.Times(rational{processes[i].maxCount, 1}).numerator
+		processes[i].count = processes[i].minCount.Times(rational{maxCount, 1}).numerator
 	}
 
 	// Infinite loop limited by timer. See checkArgs() in stock.go

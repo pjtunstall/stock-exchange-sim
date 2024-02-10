@@ -12,10 +12,15 @@ func buildGraph(resources []resource, processes []process, g goal) (bool, string
 	for _, resource := range resources {
 		isUbik := true
 		for _, process := range processes {
+			found := false
 			for _, product := range process.products {
-				if product.name != resource.name {
-					isUbik = false
+				if product.name == resource.name {
+					found = true
 				}
+			}
+			if !found {
+				isUbik = false
+				break
 			}
 		}
 		if isUbik {
@@ -71,7 +76,7 @@ func buildGraph(resources []resource, processes []process, g goal) (bool, string
 				for i := range processes {
 					for _, product := range processes[i].products {
 						if ingredient.name == product.name {
-							if processes[i].name == curr[k].name || ingredient.name == "you" {
+							if processes[i].name == curr[k].name || ingredient.name == ubik {
 								continue
 							}
 							if processes[i].added > 1 {

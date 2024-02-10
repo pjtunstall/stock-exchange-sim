@@ -22,7 +22,6 @@ type process struct {
 	final        bool
 	minCount     rational
 	count        int
-	maxCount     int
 	start        int
 	iterations   int
 	doable       bool
