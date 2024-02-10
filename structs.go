@@ -50,6 +50,9 @@ func (r rational) Times(other rational) rational {
 
 func (r rational) simplify() rational {
 	gcd := gcd(r.numerator, r.denominator)
+	if gcd == 0 {
+		return rational{0, 0}
+	}
 	return rational{
 		numerator:   r.numerator / gcd,
 		denominator: r.denominator / gcd,
@@ -70,6 +73,9 @@ func lcm(a []int) int {
 	}
 	m := a[0]
 	for _, n := range a[1:] {
+		if n == 0 || m == 0 {
+			return 0
+		}
 		m = m * n / gcd(m, n)
 	}
 	return m

@@ -1,8 +1,0 @@
-euro:3
-
-buy_materiel:(euro:1):(materiel:1):1
-build_product:(materiel:1):(product:1):1
-delivery:(product:1):(client_contentment:1;own_resentment:2):1
-hassle_client_for_payment:(own_resentment:2):(euro:2):5
-
-optimize:(time;euro)

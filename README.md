@@ -1,8 +1,8 @@
 TODO:
 
+- Write checker.
 - Check logic as I document it.
 - Refactor: trim process struct, neaten buildOutput, schedule, and graph.
-- Write checker.
 - Reinstate WriteOutput (and perhaps omit log to console, or maybe not; it's convenient and shows the end of what might be a very long file; at the audit, I should explain that the final printout should not count as part of the program time; include a note in the README to that effect).
 
 # stock-exchange-sim
@@ -32,11 +32,15 @@ Given a configuration file `build.txt`, our program, `stock`, should produce a t
 
 ## 1. Setup
 
+Optional: to build an executable file of the `stock` program, navigate into the `stock-exchange-sim` folder and run the command `go build -o stock`.
+
 ## 2. Usage
 
-Run `go . simple.txt` (or, after building an executable, `./stock simple.txt`) to create a schedule for the example called `simple.txt`.
+Run `go . simple.txt` (or, after building an executable, `./stock examples/simple`) to create a schedule for the example called `simple`.
 
-Run `go . simple.txt 10` to specify that the program should not take longer than 10 seconds.
+Run `go . simple 10` to specify that the program should not take longer than 10 seconds.
+
+Please note that we've chosen to interpret the time parameter as the execution of the actual schedule function, not including initial set-up of precedence relations, or writing the output file and printing the result to the terminal. This seemed like a more natural comparison, particularly as printing to the terminal is an optional extra for ease of viewing long outputs. It has no bearing on the result of the audit.
 
 ## 3. Audit
 
