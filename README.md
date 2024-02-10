@@ -1,8 +1,4 @@
-Back to the drawing board. My basic logic works on modifications of build where the initial processes all require one unit of a single primary resource, and their successor and end process requires different amounts of their products. But, it fails the other way around: when the initial processes require different amounts of the primary resource and the end process requires the same amout of each product.
-
-I've also yet to wrangle the infinite case into shape: fertilizer. I'm aiming to keep track of the start times in two ways, as a field startInfinite of the process struct, which is of type []int, and should list the start time of the process; and in a map that will be handy for building the output string.
-
-But the logic's not right yet.
+Wrangle the infinite case into shape: fertilizer. I'm aiming to keep track of the start times in two ways, as a field startInfinite of the process struct, which is of type []int, and should list the start time of the process; and in a map that will be handy for building the output string.
 
 TODO:
 
@@ -26,70 +22,6 @@ Maybe both. In `schedule`, we need to find the previous start time of a given pr
 At the moment, with hack of ignoring ingredient.name == "you", fertilizer creates the correct graph. "you" is distinguished by the fact that it's a product of multiple processes, indeed all processes. Restore ubik field and string.
 
 I should restrict the definition of initial processes to those for which ALL their ingredients are among the initial resources.
-
--
-
-Deal with this situation:
-
-attention:7
-
-stare_at_wall:(attention:1):(nothingness:1):15
-read_diamond_sutra:(attention:2):(insight:1):20
-chant:(attention:1):(cameradery:1):10
-attain_enlightenment:(nothingness:5;insight:1;cameradery:3):(enlightenment:1):30
-
-optimize:(time;enlightenment)
-
-It's not depleting nothingness, and it's producing enlightnment without insight. Or how about this?
-
-attention:7
-
-stare_at_wall:(attention:1):(nothingness:1):18
-read_diamond_sutra:(attention:2):(insight:1):108
-chant:(attention:3):(cameradery:1):9
-attain_enlightenment:(nothingness:2;insight:1;cameradery:3):(enlightenment:1):33
-
-optimize:(time;enlightenment)
-
-The result should be two stare_at_wall, one read_diamind_sutra, and one chant. Instead we get
-
-Processes scheduled:
-0:stare_at_wall
-0:stare_at_wall
-0:stare_at_wall
-0:stare_at_wall
-0:read_diamond_sutra
-No more process doable at cycle 1.
-Stock left:
-attention:1
-nothingness:4
-insight:1
-
-With requirements all 1 unit of attention, it works. Hmph, all wrong:
-
-attention:7
-
-stare_at_wall:(attention:4):(nothingness:1):18
-read_diamond_sutra:(attention:2):(insight:1):108
-chant:(attention:1):(cameradery:1):9
-attain_enlightenment:(nothingness:1;insight:1;cameradery:1):(enlightenment:1):33
-
-optimize:(time;enlightenment)
-
-Processes scheduled:
-0:stare_at_wall
-0:read_diamond_sutra
-0:chant
-108:attain_enlightenment
-No more process doable at cycle 142.
-Stock left:
-attention:0
-nothingness:0
-insight:0
-cameradery:0
-enlightenment:1
-
-All wrong!
 
 # stock-exchange-sim
 
