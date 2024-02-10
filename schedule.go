@@ -5,10 +5,9 @@ import (
 	"strings"
 )
 
-func schedule(resources map[string]int, processes []process, goal goal, finite bool, c <-chan struct{}) (int, map[int][]string, string) {
+func schedule(resources map[string]int, processes []process, goal goal, finite bool, c <-chan struct{}, ubik string) (int, string) {
 	finishedAt := 0
 	curr := make([]*process, 0, len(processes))
-	starts := make(map[int][]string)
 	var builder strings.Builder
 	pass := 0
 
@@ -16,10 +15,6 @@ func schedule(resources map[string]int, processes []process, goal goal, finite b
 		processes[i].count = processes[i].minCount.numerator
 		if processes[i].initial {
 			processes[i].start = 0
-			if !finite {
-				processes[i].startInfinite = append(processes[i].startInfinite, 0)
-				starts[0] = append(starts[0], processes[i].name)
-			}
 			processes[i].count = processes[i].minCount.numerator
 			processes[i].doable = true
 		}
@@ -62,7 +57,7 @@ pass:
 		for len(curr) > 0 {
 			select {
 			case <-c:
-				return finishedAt, starts, builder.String()
+				return finishedAt, builder.String()
 			default:
 			}
 			next := make([]*process, 0, len(processes))
@@ -81,12 +76,12 @@ pass:
 				}
 				curr[i].iterations += curr[i].count
 				for _, ingredient := range curr[i].ingredients {
-					if ingredient.name != "you" {
+					if ingredient.name != ubik {
 						resources[ingredient.name] -= ingredient.quantity * curr[i].count
 					}
 				}
 				for _, product := range curr[i].products {
-					if product.name != "you" {
+					if product.name != ubik {
 						resources[product.name] += product.quantity * curr[i].count
 					}
 				}
@@ -94,9 +89,7 @@ pass:
 					end := curr[i].start + curr[i].time
 					if end > curr[i].successor.start {
 						curr[i].successor.start = end
-						curr[i].successor.startInfinite = append(curr[i].successor.startInfinite, pass*end)
 					}
-					starts[pass*end] = append(starts[pass*end], curr[i].successor.name)
 					builder.WriteString(fmt.Sprintf(" %d:%s\n", curr[i].start, curr[i].name))
 					if !finite && curr[i].successor.initial {
 						curr = []*process{}
@@ -118,7 +111,7 @@ pass:
 			curr = next
 		}
 	}
-	return finishedAt, starts, builder.String()
+	return finishedAt, builder.String()
 }
 
 func maxTime(processes []*process) int {

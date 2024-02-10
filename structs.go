@@ -12,23 +12,21 @@ type resource struct {
 }
 
 type process struct {
-	name           string
-	ingredients    []resource
-	products       []resource
-	time           int
-	successor      *process
-	predecessors   []*process
-	initial        bool
-	final          bool
-	minCount       rational
-	count          int
-	maxCount       int
-	activityNumber int
-	start          int
-	startInfinite  []int
-	iterations     int
-	doable         bool
-	added          int
+	name         string
+	ingredients  []resource
+	products     []resource
+	time         int
+	successor    *process
+	predecessors []*process
+	initial      bool
+	final        bool
+	minCount     rational
+	count        int
+	maxCount     int
+	start        int
+	iterations   int
+	doable       bool
+	added        int
 }
 
 type rational struct {
@@ -58,6 +56,7 @@ func (r rational) simplify() rational {
 	}
 }
 
+// Euclid's algorithm
 func gcd(a, b int) int {
 	if b == 0 {
 		return a
@@ -113,7 +112,7 @@ func lcm(a []int) int {
 
 // 	result := fmt.Sprintf("NAME: %s, INGREDIENTS: %s, PRODUCTS: %s, TIME: %d,\nSUCCESOR: %s, PREDECESSORS: %s,",
 // 		p.name, strings.Join(ingredients, ", "), strings.Join(products, ", "), p.time, sucessor, predecessors)
-// 	result += fmt.Sprintf("\nMINCOUNT: %d, COUNT: %d, INITIAL: %v, ACTIVITY NUMBER: %d, START: %d\n", p.minCount, p.count, p.initial, p.activityNumber, p.start)
+// 	result += fmt.Sprintf("\nMINCOUNT: %d, COUNT: %d, INITIAL: %v, START: %d\n", p.minCount, p.count, p.initial, p.start)
 
 // 	return result
 // }

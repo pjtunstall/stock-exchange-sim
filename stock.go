@@ -16,15 +16,16 @@ func main() {
 		log.Fatalf("error parsing file: %v", err)
 	}
 
-	finite := buildGraph(resources, processes, goal)
+	// `ubik` is the the name of a resource that is produced by every process.
+	finite, ubik := buildGraph(resources, processes, goal)
 	currentResources := make(map[string]int)
 	for i := range resources {
 		currentResources[resources[i].name] = resources[i].quantity
 	}
 
-	end, starts, t := schedule(currentResources, processes, goal, finite, c)
+	end, t := schedule(currentResources, processes, goal, finite, c, ubik)
 	// printConfig(resources, processes, goal)
-	s := buildOutput(currentResources, processes, end, finite, starts, t)
+	s := buildOutput(currentResources, processes, end, finite, t)
 	fmt.Println()
 	fmt.Println(s)
 	// writeOutput(s)

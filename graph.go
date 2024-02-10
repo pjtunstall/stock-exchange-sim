@@ -1,44 +1,52 @@
 package main
 
-func buildGraph(resources []resource, processes []process, g goal) bool {
+func buildGraph(resources []resource, processes []process, g goal) (bool, string) {
 	var curr []*process
 
 	// Maximum number of predecessors for a process. Adjust as needed.
 	n := 64
 
-	// This will be used to assign activity numbers to the processes
-	// in such a way that successors always have greater numbers than
-	// their predecessors. This will allow us to have a default order
-	// of precedence for the processes to fall back on when there's
-	// nothing else to choose between them.
-	activityNumber := len(processes)
-
-	for i := range processes {
-		processes[i].predecessors = make([]*process, 0, n)
-		processes[i].start = -1
+	// Identify resources that is produced by every process,
+	// such as "you" in the fertilizer example.
+	var ubik string
+	for _, resource := range resources {
+		isUbik := true
+		for _, process := range processes {
+			for _, product := range process.products {
+				if product.name != resource.name {
+					isUbik = false
+				}
+			}
+		}
+		if isUbik {
+			ubik = resource.name
+			break
+		}
 	}
 
 	// Find the processes that produce the goal product.
 	// Can't use _, range here because we want to modify elements of the processes
 	// slice while iterating over it. Range would create a copy of the slice.
 	for i := range processes {
+		processes[i].predecessors = make([]*process, 0, n)
+		processes[i].start = -1
 		for _, product := range processes[i].products {
 			if product.name == g.product {
 				processes[i].added = 1
 				processes[i].final = true
 				processes[i].minCount = rational{numerator: 1, denominator: 1}
-				processes[i].activityNumber = activityNumber
-				activityNumber--
 				curr = append(curr, &processes[i])
 			}
 		}
-		// For every ingredient, if there exists a resource with the same name and non-zero quantity at least as much,
-		// then the process is initial.
+
+		// For every ingredient, if there exists a resource with the same name
+		// and non-zero quantity at least as much, then the process is initial.
 		if len(processes[i].ingredients) > 0 {
 			processes[i].initial = true
 		}
+	ingredientsLoop:
 		for _, ingredient := range processes[i].ingredients {
-			if ingredient.name == "you" {
+			if ingredient.name == ubik {
 				continue
 			}
 			found := false
@@ -50,7 +58,7 @@ func buildGraph(resources []resource, processes []process, g goal) bool {
 			}
 			if !found {
 				processes[i].initial = false
-				break
+				break ingredientsLoop
 			}
 		}
 	}
@@ -67,14 +75,12 @@ func buildGraph(resources []resource, processes []process, g goal) bool {
 								continue
 							}
 							if processes[i].added > 1 {
-								return false
+								return false, ubik
 							}
 							processes[i].added++
 							processes[i].successor = curr[k]
 							r := rational{ingredient.quantity, 1}.Times(curr[k].minCount)
 							processes[i].minCount = r.Times(rational{1, product.quantity})
-							processes[i].activityNumber = activityNumber
-							activityNumber--
 							if len(curr[k].predecessors) == 0 || curr[k].predecessors[0].name != processes[i].name {
 								curr[k].predecessors = append(curr[k].predecessors, &processes[i])
 							}
@@ -86,5 +92,5 @@ func buildGraph(resources []resource, processes []process, g goal) bool {
 		}
 		curr = next
 	}
-	return true
+	return true, ubik
 }

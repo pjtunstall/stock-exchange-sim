@@ -1,15 +1,9 @@
 TODO:
 
 - Check logic as I document it.
-- Refactor.
+- Refactor: trim process struct, neaten buildOutput, schedule, and graph.
 - Write checker.
-- Create own finite example.
-- Create more complex own infinite example.
 - Reinstate WriteOutput (and perhaps omit log to console, or maybe not; it's convenient and shows the end of what might be a very long file; at the audit, I should explain that the final printout should not count as part of the program time; include a note in the README to that effect).
-
-- At the moment, with hack of ignoring ingredient.name == "you", fertilizer creates the correct graph. "you" is distinguished by the fact that it's a product of multiple processes, indeed all processes. Restore ubik field and string.
-
-- I should restrict the definition of initial processes to those for which ALL their ingredients are among the initial resources.
 
 # stock-exchange-sim
 
@@ -47,8 +41,6 @@ Run `go . simple.txt 10` to specify that the program should not take longer than
 ## 3. Audit
 
 Exact outputs may vary from those suggested in the audit questions, especially where time is not to be optimized, since then there is less constraint on how soon they can be scheduled. Thus, for `seller`, the audit suggestion takes a more leisurely approach, whereas our program schedules processes as soon as the precedence relations allow, because why not?
-
-For me, 0.0007 is a good wait time for looking at `fertilizer`. Your milage may vary. Try it a few times, as the exact number of iterations can vary. It's a fine line between no cycles and hundreds of them.
 
 ## 4. Research
 
