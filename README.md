@@ -1,11 +1,11 @@
 # stock-exchange-sim
 
-0. [Brief](#-brief)
+0. [Brief](#0-brief)
 1. [Setup](#1-setup)
 2. [Usage](#2-usage)
 3. [Audit](#3-audit)
-4. [Research](#3-research)
-5. [Strategy](#4-strategy)
+4. [Research](#4-research)
+5. [Strategy](#5-strategy)
 
 ## 0. Brief
 
@@ -71,12 +71,16 @@ After all that, neither scheme quite works for us, given the different underlyin
 
 We start with the simplifying assumption that, as in our examples, processes can have multiple predecessors but only one sucessor. We also make some "good faith" assumptions about the configuration file, such as the absence of processes that don't contribute towards the goal. A more robust scheme would need to deal with such cases.
 
-For a finite project, let the `count` of a process be the number of times it's scheduled to be performed. For a project that is infinite, due to renewable resourses, the `count` of a task will be the number of times it's scheduled to be performed per iteration of a loop that runs till interupted by a signal from the timer.
+Our program scheduled tasks by taking as many passes through the precedence graph as resources permit. Before the first pass, an array (in Go terms, a slice) of the tasks currently being considered is initialized with tasks that can start at once.
+
+We define the `count` of a process as the number of times it needs to be scheduled to produce one unit of the target item. The `iterations` of a process will be the number of times it is eventually scheduled.
 
 Set all `count`s to zero initially. Also give each process a field `minCount` that will be used to initialize the count. `minCount` will be of a home-made type, rational, representing a rational number. Set the `minCount` of each task to 1 initially. Then procede backwards from final tasks (defined as those that directly produce the target item) to initial ones (those that can be performed immediately). At each iteration, identify predecessors and successors, and set the `minCount` of a process equal to the `minCount` of its successor times the quantity that its successor needs of the item by which they're linked, divided by the quantity that it produces of that item.
 
 Now, define `maxCount` as the least common multiple of the denominators of all the `minCount`s, and set the `count` of a process equal to the numerator of `maxCount` times its `minCount`.
 
-At each stage of scheduling, we check whether a task can be performed `count` number of times, given the resources. If not, it can't be scheduled. If so, schedule it as soon as possible, given the durations and start times of its precursors. For finite projects, the end time is the start time of the final process plus its duration. For cycling projects, the provisional end time is continually updated as tasks are scheduled, and returned along with the schedule when the timer signals to finish.
+While the current task array is not empty, we check whether each task can be performed `count` number of times, given the resources. If not, it can't be scheduled any more. If so, it will be scheduled as soon as possible, given the durations and start times of its precursors. We consider initial processes first, then their successors, and so on, till the final process has been scheduled. Then we return to the beginning (the next pass), and keep going till there are no more resources to proceed.
 
-The examples show that more than one instance of a process can be scheduled simultaneously, which makes time optimization trivial: just schedule as many instances of all tasks, in the necessary proportions, as resources permit. We do the same for the infinite case, except that we repeat the whole scheduling procedure round and round the precedence graph till the timer signals to finish.
+For finite projects, the end time is defined as the start time of the final process plus its duration. For cycling projects, the provisional end time is updated as tasks are scheduled, and returned along with the schedule when the timer signals to finish.
+
+The examples show that more than one instance of a process can be scheduled simultaneously, which makes time optimization trivial: just schedule as many instances of all tasks, in the necessary proportions, as resources permit.

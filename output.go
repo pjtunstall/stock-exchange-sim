@@ -8,7 +8,11 @@ import (
 	"strings"
 )
 
-func buildOutput(resources map[string]int, processes []process, end int, finite bool, t string) string {
+func buildOutput(resources map[string]int,
+	processes []process,
+	end int,
+	finite bool,
+	t string) string {
 	var builder strings.Builder
 	builder.WriteString("Processes scheduled:\n")
 	var someScheduled bool
@@ -18,7 +22,8 @@ func buildOutput(resources map[string]int, processes []process, end int, finite 
 				if process.start == i {
 					for j := 0; j < process.iterations; j++ {
 						someScheduled = true
-						builder.WriteString(fmt.Sprintf(" %d:%s\n", process.start, process.name))
+						str := fmt.Sprintf(" %d:%s\n", process.start, process.name)
+						builder.WriteString(str)
 					}
 				}
 			}

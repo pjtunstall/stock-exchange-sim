@@ -55,7 +55,7 @@ func checkArgs(ch bool) float64 {
 		if ch {
 			return f
 		}
-		g, err := strconv.ParseFloat(flag.Arg(2), 64)
+		g, err := strconv.ParseFloat(flag.Arg(1), 64)
 		if err != nil {
 			log.Fatalf("error parsing wait time: %v", err)
 		}

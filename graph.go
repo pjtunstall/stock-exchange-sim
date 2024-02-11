@@ -90,6 +90,7 @@ func buildGraph(resources []resource, processes []process, g goal) (bool, string
 								curr[k].predecessors = append(curr[k].predecessors, &processes[i])
 							}
 							next = append(next, &processes[i])
+							break
 						}
 					}
 				}

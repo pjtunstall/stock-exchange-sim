@@ -5,7 +5,12 @@ import (
 	"strings"
 )
 
-func schedule(resources map[string]int, processes []process, goal goal, finite bool, c <-chan struct{}, ubik string) (int, string) {
+func schedule(resources map[string]int,
+	processes []process,
+	goal goal,
+	finite bool,
+	c <-chan struct{},
+	ubik string) (int, string) {
 	finishedAt := 0
 	curr := make([]*process, 0, len(processes))
 	var builder strings.Builder
