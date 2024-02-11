@@ -1,17 +1,20 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 )
 
 func main() {
-	c := make(chan struct{})
-	setTimer(checkArgs(), c)
+	checkerFlag := flag.Bool("checker", false, "run the checker")
+	flag.Parse()
 
-	resources, processes, goal, err := parseFile("./" + os.Args[1])
+	c := make(chan struct{})
+	setTimer(checkArgs(*checkerFlag), c)
+
+	resources, processes, goal, err := parseFile("./" + flag.Arg(0))
 	if err != nil {
 		log.Fatalf("error parsing file: %v", err)
 	}
@@ -23,29 +26,36 @@ func main() {
 		currentResources[resources[i].name] = resources[i].quantity
 	}
 
+	if *checkerFlag {
+		checker(currentResources, processes, goal)
+	}
+
 	end, t := schedule(currentResources, processes, goal, finite, c, ubik)
-	// printConfig(resources, processes, goal)
+
 	s := buildOutput(currentResources, processes, end, finite, t)
 	fmt.Println()
 	fmt.Println(s)
 
-	// // Uncomment to write output to file.
-	// writeOutput(s)
+	writeOutput(s)
 }
 
-func checkArgs() float64 {
+func checkArgs(ch bool) float64 {
 	// Default waiting time: 1 second
+	usage := "usage: ./stock <file> <waiting_time>\n./stock -checker <file> <log_file>"
 	f := 1.0
-	if len(os.Args) > 3 {
+	if flag.NArg() > 2 {
 		log.Println("too many arguments")
-		log.Fatal("usage: ./stock <file> <waiting_time>")
+		log.Fatal(usage)
 	}
-	if len(os.Args) < 2 {
+	if flag.NArg() < 1 {
 		log.Println("not enough arguments")
-		log.Fatal("usage: ./stock <file> <waiting_time>")
+		log.Fatal(usage)
 	}
-	if len(os.Args) == 3 {
-		g, err := strconv.ParseFloat(os.Args[2], 64)
+	if flag.NArg() == 2 {
+		if ch {
+			return f
+		}
+		g, err := strconv.ParseFloat(flag.Arg(2), 64)
 		if err != nil {
 			log.Fatalf("error parsing wait time: %v", err)
 		}

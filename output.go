@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"log"
+	"os"
 	"strings"
 )
 
@@ -38,15 +41,15 @@ func buildOutput(resources map[string]int, processes []process, end int, finite 
 	return s
 }
 
-// func writeOutput(s string) {
-// 	file, err := os.Create(os.Args[1] + ".log")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer file.Close()
+func writeOutput(s string) {
+	file, err := os.Create(os.Args[1] + ".log")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
 
-// 	_, err = io.WriteString(file, s)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// }
+	_, err = io.WriteString(file, s)
+	if err != nil {
+		log.Fatal(err)
+	}
+}

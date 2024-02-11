@@ -1,11 +1,3 @@
-TODO:
-
-- Write checker.
-- Reinstate WriteOutput (and perhaps omit log to console, or maybe not; it's convenient and shows the end of what might be a very long file; at the audit, I should explain that the final printout should not count as part of the program time; include a note in the README to that effect).
-
-- Refactor: trim process struct, neaten buildOutput, schedule, and graph.
-- Scrutinize logic.
-
 # stock-exchange-sim
 
 0. [Brief](#-brief)
@@ -17,19 +9,23 @@ TODO:
 
 ## 0. Brief
 
+This is a project in the [01 Edu](https://01-edu.org/) system. It's an optional extra, at least for us at 01Founders in London, 2024. It can be done in any compiled language. We chose Go.
+
 According to the [instructions](https://github.com/01-edu/public/tree/master/subjects/stock-exchange-sim), we need to write a program, `stock`, that takes two command-line arguments.
 
 This first is the path to a text file, which they call a "configuration file", formatted in a certain way. Our program should derive information, from this file, about a project. The file will contain a list of resources and quantities of each available at the start of the project; a list of processes with information about which resources they consume, in what quantity, and what products they produce and in what quantity; also, how long each process takes. Finally, it will specify the goal of the project, in the form of an item whose production should be "optimized", i.e. maximized.
 
-The configuration file can also specify that time should be optimized too. In the case of non-renewable resources, we take this to mean that time should be minimized given that the maximum amount of the goal should be produced.
+The configuration file can also specify that time should be optimized too. In the case of non-renewable resources, we take this to mean that time should be minimized provided that the maximum amount of the goal is produced.
 
 Comments in some of the examples suggest the possibility of multiple resources to optimize, but none of the examples actually realize that possibility. The line of the examples that cites the goal always has the format `optimize:(<stock_name>)` or `optimize:(time;<stock_name>)`. Although the instructions speak of "elements" to optimize, the format they specify is `optimize:(<stock_name>|time)`. No indication is given of how one would decide between conflicting goals. We could show precedence by the order they're listed in, but, for now, have taken the easier path of assuming only one stock item is to be maximized.
 
 The second argument is an integer representing the maximum number of seconds the program must take to execute.
 
-There are two types of task: those that can continue indefinitely thanks to renewable resources, and those that have a finite objective. (Given that the number of instances of a task that can be scheduled at once is only limited by resources and precedence relations, time optimization would seem to only trivially relevant when resources are not renewable.)
+There are two types of task: those that can continue indefinitely thanks to renewable resources, and those that have a finite objective.
 
-Given a configuration file `build.txt`, our program, `stock`, should produce a text file `build.log`, consisting of a schedule: a list of processes (possibly including several instances of the same process, possibly overlapping), the statement "No more process duable at", followed by an integer one unit greater than the duration of whole project, and a list of stock (resources and products) left at the end.
+Given a configuration file `build`, our program, `stock`, should produce a text file `build.log`, consisting of a schedule: a list of processes (possibly including several instances of the same process, possibly overlapping), the statement "No more process duable at", followed by an integer one unit greater than the duration of whole project, and a list of stock (resources and products) left at the end.
+
+We should also make a checker that will check the processes listed in a log file and confirm that there are enough resources to perform each task listed at the specified start time.
 
 ## 1. Setup
 
@@ -37,11 +33,15 @@ Optional: to build an executable file of the `stock` program, navigate into the 
 
 ## 2. Usage
 
-Run `go . simple.txt` (or, after building an executable, `./stock examples/simple`) to create a schedule for the example called `simple`.
+Run `go . simple` (or, after building an executable, `./stock examples/simple`) to create a schedule for the example called `simple`.
 
 Run `go . simple 10` to specify that the program should not take longer than 10 seconds.
 
+We've chosen to implement the checker as part of the same program. To check `simple.log`, run `go run . -checker examples/simple examples/simple.log` (or `./stock -checker examples/simple examples/simple.log` as the case may be).
+
 ## 3. Audit
+
+As mentioned, we implemented the checker as part of the main program. A boolean flag is used to select checker mode. See `main.go` for the code that deals with the flag and other arguments, and `checker.go` for the checker function itself.
 
 You'll find the configuration files and logs for the given examples in the `examples` folder, together with the two examples we were required to create: `zen` (finite) and `matryushka` (infinite).
 
@@ -61,7 +61,7 @@ In Priority Rule Based Scheduling, a graph of precedence relationships is drawn 
 
 - Parallel
 
-A SERIAL schedule generation scheme with N tasks takes N steps. One task is chosen, at each step, from the set of available tasks and moved to the set of completed tasks. (A task is available if it is the direct the successor to a completed task, and current resources suffice to perform it.) If multiple tasks are available, one is chosen according to the priority rule. If several have equal priority, the one with the lowest activity number is selected.
+A SERIAL schedule generation scheme with N tasks takes N steps. One task is chosen, at each step, from the set of available tasks and moved to the set of completed tasks. (A task is available if it's the direct the successor to a completed task, and current resources suffice to perform it.) If multiple tasks are available, one is chosen according to the priority rule. If several have equal priority, the one with the lowest activity number is selected.
 
 A PARALLEL schedule generation scheme with N tasks takes at most N steps. At each step, we schedule zero or more activities. Tasks are partitioned into completed, in progress, and available. The schedule time associated with a step is calculated as the earliest completion time of the tasks that were in progress during the previous step. Tasks whose finish time is equal to the schedule time are moved from the set of tasks in progress to the set of completed tasks. This may make other tasks available. As long as tasks are available, they're chosen one by one, in order as in a serial scheme, and started at the current schedule time, then we move on to the next step. The algorithm terminates when all tasks are completed or in progress.
 
@@ -78,3 +78,5 @@ Set all `count`s to zero initially. Also give each process a field `minCount` th
 Now, define `maxCount` as the least common multiple of the denominators of all the `minCount`s, and set the `count` of a process equal to the numerator of `maxCount` times its `minCount`.
 
 At each stage of scheduling, we check whether a task can be performed `count` number of times, given the resources. If not, it can't be scheduled. If so, schedule it as soon as possible, given the durations and start times of its precursors. For finite projects, the end time is the start time of the final process plus its duration. For cycling projects, the provisional end time is continually updated as tasks are scheduled, and returned along with the schedule when the timer signals to finish.
+
+The examples show that more than one instance of a process can be scheduled simultaneously, which makes time optimization trivial: just schedule as many instances of all tasks, in the necessary proportions, as resources permit. We do the same for the infinite case, except that we repeat the whole scheduling procedure round and round the precedence graph till the timer signals to finish.
