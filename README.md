@@ -6,10 +6,11 @@
 3. [Audit](#3-audit)
 4. [Research](#4-research)
 5. [Strategy](#5-strategy)
+6. [Further](#6-further)
 
 ## 0. Brief
 
-This is a project in the [01 Edu](https://01-edu.org/) system. It's an optional extra, at least for us at 01Founders in London, 2024. It can be done in any compiled language. We chose Go.
+This is a project in the [01 Edu](https://01-edu.org/) system, introducing the idea of a [process chain](https://en.wikipedia.org/wiki/Event-driven_process_chain). It's an optional extra, at least for us at 01Founders in London, 2024. It can be done in any compiled language. We chose Go.
 
 According to the [instructions](https://github.com/01-edu/public/tree/master/subjects/stock-exchange-sim), we need to write a program, `stock`, that takes two command-line arguments.
 
@@ -84,3 +85,16 @@ While the current task array is not empty, we check whether each task can be per
 For finite projects, the end time is defined as the start time of the final process plus its duration. For cycling projects, the provisional end time is updated as tasks are scheduled, and returned along with the schedule when the timer signals to finish.
 
 The examples show that more than one instance of a process can be scheduled simultaneously, which makes time optimization trivial: just schedule as many instances of all tasks, in the necessary proportions, as resources permit.
+
+## 6. Further
+
+While this program does generate plausible schedules for the given examples and our own simple configuration files, it's far from robust. It doesn't yet allow for the possibility of one task having multiple successors. It assumes tasks have been well chosen and just need scheduling. It doesn't decide effectively between rival processes, having the same input and output, whether of the same or differing effectiveness:
+
+```do_doorknobs:(board:1):(doorknobs:1):15
+do_more_doorknobs:(board:1):(doorknobs:2):15
+do_background:(board:2):(background:1):20
+do_shelf:(board:1):(shelf:1):10
+do_cabinet:(doorknobs:2;background:1;shelf:3):(cabinet:1):30
+```
+
+This results in too many doorknobs and no cabinet! A more thorough version would also want to deal with mischievous processes, such as `do_rubbish_doorknobs:(board:1):(doorknobs:0):15` or `do_nothing:(board:1):(cabinet:0):15` or `do_doorknobs_and_more:(board:1):(doorknobs:12):15` or `do_what_now?:(board:0):(caperberries:12):15`.

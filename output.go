@@ -1,10 +1,12 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"log"
 	"os"
+	"path"
 	"strings"
 )
 
@@ -47,7 +49,10 @@ func buildOutput(resources map[string]int,
 }
 
 func writeOutput(s string) {
-	file, err := os.Create(os.Args[1] + ".log")
+	filename := flag.Arg(0)
+	basename := strings.TrimSuffix(filename, path.Ext(filename))
+	logFilename := basename + ".log"
+	file, err := os.Create("./" + logFilename)
 	if err != nil {
 		log.Fatal(err)
 	}
