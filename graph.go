@@ -35,11 +35,11 @@ func buildGraph(resources []resource, processes []process, g goal) (bool, string
 	for i := range processes {
 		processes[i].predecessors = make([]*process, 0, n)
 		processes[i].start = -1
+		processes[i].minCount = rational{numerator: 1, denominator: 1}
 		for _, product := range processes[i].products {
 			if product.name == g.product {
 				processes[i].added = 1
 				processes[i].final = true
-				processes[i].minCount = rational{numerator: 1, denominator: 1}
 				curr = append(curr, &processes[i])
 			}
 		}

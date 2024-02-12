@@ -52,7 +52,7 @@ Please note that we've chosen to interpret the time parameter as marking when to
 
 ## 4. Research
 
-As recommended, we consulted [PM Knowledge Center](https://www.pmknowledgecenter.com), a collection of resources on "Project Management and Dynamic Scheduling". We found further background reading necessary to fill in the gaps in the explanations there: in particular, [Kolisch (1994)](https://www.econstor.eu/bitstream/10419/155418/1/manuskript_344.pdf). These sources describe what's known as a Resource Constrained Project Scheduling Problem. The heuristic type of solution our instructions direct us towards is called Priority Rule Based Scheduling.
+Following the recommendation of the project description, we consulted [PM Knowledge Center](https://www.pmknowledgecenter.com), a collection of resources on "Project Management and Dynamic Scheduling". We found further background reading necessary to fill in the gaps in the explanations there: in particular, [Kolisch (1994)](https://www.econstor.eu/bitstream/10419/155418/1/manuskript_344.pdf). These sources describe what's known as a Resource Constrained Project Scheduling Problem. The heuristic type of solution our instructions direct us towards is called Priority Rule Based Scheduling.
 
 Before going into detail, we should note that the above sources (or Kolish, at least, who gives more detailed algorithms) assume that each task can only be performed once per project, whereas our program is expected to deal with cases where tasks can and should be performed more than once (in succession or simultaneously), if resorces allow, to optimize what needs optimizing. This meant that we couldn't directly apply either of the proposed scheduling methods.
 
@@ -88,13 +88,23 @@ The examples show that more than one instance of a process can be scheduled simu
 
 ## 6. Further
 
-While this program does generate plausible schedules for the given examples and our own simple configuration files, it's far from robust. It doesn't yet allow for the possibility of one task having multiple successors. It assumes tasks have been well chosen and just need scheduling. It doesn't decide effectively between rival processes, having the same input and output, whether of the same or differing effectiveness:
+While this program does generate plausible schedules for the given examples and our own simple configuration files, it's far from robust. It doesn't yet allow for the possibility of one task having multiple successors. It assumes tasks have been well chosen and just need giving start times and number of instances to perform at those times. It doesn't decide effectively between rival processes, having the same input and output, whether of the same or differing effectiveness:
 
-```do_doorknobs:(board:1):(doorknobs:1):15
+```board:7
+
+do_doorknobs:(board:1):(doorknobs:1):15
 do_more_doorknobs:(board:1):(doorknobs:2):15
 do_background:(board:2):(background:1):20
 do_shelf:(board:1):(shelf:1):10
 do_cabinet:(doorknobs:2;background:1;shelf:3):(cabinet:1):30
+
+optimize:(time;cabinet)
 ```
 
-This results in too many doorknobs and no cabinet! A more thorough version would also want to deal with mischievous processes, such as `do_rubbish_doorknobs:(board:1):(doorknobs:0):15` or `do_nothing:(board:1):(cabinet:0):15` or `do_doorknobs_and_more:(board:1):(doorknobs:12):15` or `do_what_now?:(board:0):(caperberries:12):15`.
+The above configuration results in too many doorknobs and no cabinet! We should really just pick the most effective of such rivals, but what if the effectiveness is only demonstrated several steps down the line? A more thorough version would also want to deal with mischievous processes, such as `do_nothing:(board:1):(cabinet:0):15` or `do_what_now?:(board:0):(caperberries:12):15`.
+
+Note the sensitivity to task-listing order of our own example `macguffin`.
+
+If we content ourselves with a heuristic, should we favor not wasting surplus when resources are plentiful, or should we make sure we obtain at least one unit of the end product however sparse they are?
+
+A better scheme might be to consider the linking item and divide the quantity required by the quantity produced, then take the ceiling to obtain the minimum number of times the producer needs to be performed to contribute one unit of its successor, provided other requirements are met. If there are multiple linking items, as in `fertilizer`, we'd chose the maximum of these ceilings. Having found how many times each task needs to be executed to obtain a unit of the goal, a first pass of scheduling could be performed, and the resources updated. In this way, a solution could be found incrementally ...
