@@ -101,10 +101,10 @@ do_cabinet:(doorknobs:2;background:1;shelf:3):(cabinet:1):30
 optimize:(time;cabinet)
 ```
 
-The above configuration results in too many doorknobs and no cabinet! We should really just pick the most effective of such rivals, but what if the effectiveness is only demonstrated several steps down the line? A more thorough version would also want to deal with mischievous processes, such as `do_nothing:(board:1):(cabinet:0):15` or `do_what_now?:(board:0):(caperberries:12):15`.
+The above configuration results in too many doorknobs and no cabinet! We should really just pick the most effective of such rivals, but what if the effectiveness is only demonstrated several steps down the line? A more thorough version would also want to deal with lazy processes, such as `do_nothing:(board:1):(cabinet:0):15`, or mischievous ones: `do_what_now?:(board:0):(caperberries:12):15`.
 
 Note the sensitivity to task-listing order of our own example `macguffin`.
 
-If we content ourselves with a heuristic, should we favor not wasting surplus when resources are plentiful, or should we make sure we obtain at least one unit of the end product however sparse they are?
+If we content ourselves with a heuristic, should we favor not wasting surplus when resources are plentiful, or should we make sure we obtain at least one unit of the end product however meager they are?
 
 A better scheme might be to consider the linking item and divide the quantity required by the quantity produced, then take the ceiling to obtain the minimum number of times the producer needs to be performed to contribute one unit of its successor, provided other requirements are met. If there are multiple linking items, as in `fertilizer`, we'd chose the maximum of these ceilings. Having found how many times each task needs to be executed to obtain a unit of the goal, a first pass of scheduling could be performed, and the resources updated. In this way, a solution could be found incrementally ...
