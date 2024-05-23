@@ -88,7 +88,7 @@ The examples show that more than one instance of a process can be scheduled simu
 
 ## 6. Further
 
-While this program does generate plausible schedules for the given examples and our own simple configuration files, it's far from robust. It doesn't yet allow for the possibility of one task having multiple successors. It assumes tasks have been well chosen and just need giving start times and number of instances to perform at those times. It doesn't decide effectively between rival processes, having the same input and output, whether of the same or differing effectiveness:
+While this program does generate plausible schedules for the given examples and our own simple configuration files, it's far from robust. It doesn't yet allow for the possibility of one task having multiple successors. It assumes tasks have been well chosen and just need giving start times and number of instances to perform at those times. It doesn't decide effectively between rival processes having the same input and output, whether of the same or differing effectiveness:
 
 ```board:7
 
@@ -105,6 +105,6 @@ The above configuration results in too many doorknobs and no cabinet! We should 
 
 Note the sensitivity to task-listing order of our own example `macguffin`.
 
-If we content ourselves with a heuristic, should we favor not wasting surplus when resources are plentiful, or should we make sure we obtain at least one unit of the end product however meager they are?
+If we content ourselves with a heuristic, should we favor not wasting surplus when resources are plentiful, or should we make sure we obtain at least one unit of the end product however meager they are? The answer might depend on the user's objective. It could be left as an option.
 
 A better scheme might be to consider the linking item and divide the quantity required by the quantity produced, then take the ceiling to obtain the minimum number of times the producer needs to be performed to contribute one unit of its successor, provided other requirements are met. If there are multiple linking items, as in `fertilizer`, we'd chose the maximum of these ceilings. Having found how many times each task needs to be executed to obtain a unit of the goal, a first pass of scheduling could be performed, and the resources updated. In this way, a solution could be found incrementally ...
