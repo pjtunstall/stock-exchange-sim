@@ -46,7 +46,11 @@ As mentioned, we implemented the checker as part of the main program. A boolean 
 
 You'll find the configuration files for the given examples in the `examples` folder, together with the two examples we were required to create: `zen` (finite) and `matryushka` (infinite). (We actually made three. There's a bonus finite one: `macguffin`.)
 
-Exact outputs may vary from those suggested in the audit questions, especially where time is not to be optimized, since, in that case, there is less constraint on how soon tasks can be scheduled. Thus, for `seller`, the audit suggestion takes a more leisurely approach, whereas our program schedules processes as soon as the precedence relations allow, because why not? The finite examples are all simple enough to confirm manually that the logs are correct. The cyclic ones can be examined for a few cycles<sup id="ref-f1">[1](#f1)</sup> (in the sense of complete iterations of the project) to get the idea.
+The given erroneous configuration files, to test error handling in the main `stock` program, are in `examples/errors`. The configuration file `testchecker` and the corresponding erroneous log file `testchecker.log`, to test error handling in checker mode, are in `examples/checkererror`.
+
+The finite examples are all simple enough to confirm manually that the logs are correct. The cyclic ones can be examined for a few cycles<sup id="ref-f1">[1](#f1)</sup> (in the sense of complete iterations of the project) to get the idea.
+
+Exact outputs may vary from those suggested in the audit questions, especially where time is not to be optimized, since, in that case, there is less constraint on how soon tasks can be scheduled. Thus, for `seller`, the audit suggestion takes a more leisurely approach, whereas our program schedules processes as soon as the precedence relations allow, because why not?
 
 Please note that we've chosen to interpret the time parameter as marking when to end the schedule function itself. Writing the output file (and printing the result to the terminal, if you choose to uncomment those lines in `main.go`) happen after the schedule is made. This seemed like the most natural interpretation of the instructions, particularly as printing to the terminal is an optional extra for the convenience of viewing small outputs without having to open the log file. It has no bearing on the result of the audit, which just asks you to confirm that fewer processes are performed in 0.003s than 1s for the example `fertilizer`.
 
