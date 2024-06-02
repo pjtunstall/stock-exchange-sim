@@ -36,14 +36,10 @@ func main() {
 	end, t := schedule(currentResources, processes, finite, c, ubik)
 
 	s := buildOutput(currentResources, processes, end, finite, t)
-
-	// // Uncomment to print the output to the console, but be warned that very
-	// // large outputs will take a long time to print. This time is not limited
-	// // by the time argument. With cyclic examples (renewable resources), and
-	// // large outputs, you're better off just writing the output to a file.
-	// fmt.Println(s)
-
 	writeOutput(s)
+
+	// // Uncomment to print the schedule to the terminal.
+	// fmt.Print(s)
 }
 
 func checkArgs(ch bool) float64 {
@@ -73,22 +69,3 @@ func checkArgs(ch bool) float64 {
 	}
 	return f
 }
-
-// // Uncomment to print resources, processes, and goal to the console.
-// // If you do so, uncomment other items as indicated by your IDE.
-// func printConfig(resources []resource, processes []process, goal goal) {
-// 	fmt.Println("\nResources:")
-// 	for _, r := range resources {
-// 		fmt.Println(r.string())
-// 	}
-// 	fmt.Println()
-
-// 	fmt.Println("\nProcesses:")
-// 	for _, p := range processes {
-// 		fmt.Println(p.string())
-// 	}
-
-// 	fmt.Println("\nOptimize:")
-// 	fmt.Println(goal.string())
-// 	fmt.Println()
-// }

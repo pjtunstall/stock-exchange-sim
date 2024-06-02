@@ -35,12 +35,12 @@ func checker(resources map[string]int, processes []process) {
 		if len(ln) != 2 {
 			break
 		}
-		cycle := ln[0]
+		cycle := strings.TrimSpace(ln[0])
 		name := ln[1]
+		fmt.Println("Evaluating:", line)
 
-		trimmedCycle := strings.TrimSpace(cycle)
-		if _, err := strconv.Atoi(trimmedCycle); err != nil {
-			fmt.Printf("Error parsing cycle: %v\n", err)
+		if _, err := strconv.Atoi(cycle); err != nil {
+			fmt.Printf("Error while parsing: %s\n", err)
 			fmt.Println("Exiting...")
 			os.Exit(1)
 		}

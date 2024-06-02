@@ -42,6 +42,8 @@ We've chosen to implement the checker as part of the same program. To check `sim
 
 ## 3. Audit
 
+A Zsh script, `audit.zsh`, is provided, for your convenience, to run the examples in the Functional section. Alternatively, you're welcome to type any or all of the commands yourself. In either case, please take care to check the resulting files and ask any questions you might have about the project.
+
 As mentioned, we implemented the checker as part of the main program. A boolean flag is used to select checker mode. See `main.go` for the code that deals with the flag and other arguments, and `checker.go` for the checker function itself.
 
 You'll find the configuration files for the given examples in the `examples` folder, together with the two examples we were required to create: `zen` (finite) and `matryushka` (infinite). (We actually made three. There's a bonus finite one: `macguffin`.)
@@ -54,7 +56,29 @@ Exact outputs may vary from those suggested in the audit questions, especially w
 
 Please note that we've chosen to interpret the time parameter as marking when to end the schedule function itself. Writing the output file (and printing the result to the terminal, if you choose to uncomment those lines in `main.go`) happen after the schedule is made. This seemed like the most natural interpretation of the instructions, particularly as printing to the terminal is an optional extra for the convenience of viewing small outputs without having to open the log file. It has no bearing on the result of the audit, which just asks you to confirm that fewer processes are performed in 0.003s than 1s for the example `fertilizer`.
 
-Note also that how much the program can accomplish in a given time may vary depending on your computer and what it's is doing in the background on a given occasion. On one occasion, you might find that `./stock /examples/matryushka 0.001` manages several hundred iterations of its cyclic<sup id="ref-f1">[1](#f1)</sup> project. On another, it might not have time for any.
+Note also that how much the program can accomplish, in a given time, may vary depending on your computer and what it's is doing in the background on a given occasion. On one occasion, you might find that `./stock /examples/matryushka 0.001` manages several hundred iterations of its cyclic<sup id="ref-f1">[1](#f1)</sup> project. On another, it might not have time for any.
+
+```It is up to you to create and organize the display, it must nevertheless allow the understanding of the main actions carried out by the program.
+
+```
+
+By default, we just write the the result to a log file. If you'd like to see it in the console too, you can uncomment the indicated line in `main.go` (before building the binary). This works fine for naturally terminating projects, but be warned that, when let run for even a few miliseconds, the indefinitely looping ones, `fertilizer` and `matryushka`, can output hundreds of thousands of lines. So, if you're using the Zsh script, you might want to just view the log files.
+
+In the section about the checker, the instructions say,
+
+```The display must indicate whether the sequence is correct, or indicate the cycle and the process which are causing the problem. In all cases, at the end of the program, stocks are displayed, as well as the last cycle.
+
+```
+
+But the examples in the instructions and the audit are of the form
+
+```Evaluating: 0:buy_materiel
+Evaluating: 10:build_product
+Evaluating: 40:delivery
+Trace completed, no error detected.
+```
+
+(Thus displaying neither stock nor "cycle"<sup id="ref-f1">[1](#f1)</sup>.) We've chosen to follow the the format exemplified rather than that described. Maybe the description was a mistake or meant to refer instead to the schedule-generator program, which does indeed list any remaining stock and the last (or, rather, one after the last) cycle.
 
 ## 4. Research
 
