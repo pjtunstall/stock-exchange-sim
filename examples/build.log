@@ -1,3 +1,10 @@
+# This is a hand-made log, designed to show what would happen
+# if the program gave an output that mistakenly tried to
+# do a process that's not possible because there isn't
+# enough stock. The real output says to do_doorknobs three
+# times. This erroneous log shows what would happen if it
+# only ran do_doorknobs twice, so that there aren't enough
+# doorknobs to make the cabinet.
 Processes scheduled:
  0:do_doorknobs
  0:do_doorknobs

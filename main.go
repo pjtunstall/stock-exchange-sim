@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"strconv"
 )
@@ -33,8 +32,12 @@ func main() {
 	end, t := schedule(currentResources, processes, goal, finite, c, ubik)
 
 	s := buildOutput(currentResources, processes, end, finite, t)
-	fmt.Println()
-	fmt.Println(s)
+
+	// Uncomment to print the output to the console, but be warned that very
+	// large outputs will take a long time to print. This time is not limited
+	// by the time argument. With cyclic examples (renewable resources), and
+	// large outputs, you're better off writing the output to a file.
+	// fmt.Println(s)
 
 	writeOutput(s)
 }

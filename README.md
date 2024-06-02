@@ -24,28 +24,28 @@ The second argument is an integer representing the maximum number of seconds the
 
 There are two types of task: those that can continue indefinitely thanks to renewable resources, and those that have a finite objective.
 
-Given a configuration file `build`, our program, `stock`, should produce a text file `build.log`, consisting of a schedule: a list of processes (possibly including several instances of the same process, possibly overlapping), the statement "No more process duable at", followed by an integer one unit greater than the duration of whole project, and a list of stock (resources and products) left at the end.
+Given a configuration file `build`, our program, `stock`, should produce a text file `build.log`, consisting of a schedule: a list of processes (possibly including several instances of the same process, possibly overlapping), the statement "No more process doable at", followed by an integer one unit greater than the duration of whole project, and a list of stock (resources and products) left at the end.
 
 We should also make a checker that will check the processes listed in a log file and confirm that there are enough resources to perform each task listed at the specified start time.
 
 ## 1. Setup
 
-Optional: to build an executable file of the `stock` program, navigate into the `stock-exchange-sim` folder and run the command `go build -o stock`.
+To build an executable file of the `stock` program, navigate into the `stock-exchange-sim` folder and run the command `go build -o stock`. You could also type `go run . <file>`, but we recommend building an executable first if you want to see that the timer is working. When you enter `go run . <file>`, you have to wait for the program to compile each time you run it.
 
 ## 2. Usage
 
-Run `go . simple` (or, after building an executable, `./stock examples/simple`) to create a schedule for the example called `simple`.
+Enter `./stock examples/simple` to create a schedule for the example called `simple`.
 
-Run `go . simple 10` to specify that the program should not take longer than 10 seconds.
+Run `./stock simple 10` to specify that the program should not take longer than 10 seconds.
 
-We've chosen to implement the checker as part of the same program. To check `simple.log`, run `go run . -checker examples/simple examples/simple.log` (or `./stock -checker examples/simple examples/simple.log` as the case may be).
+We've chosen to implement the checker as part of the same program. To check `simple.log`, run `./stock -checker examples/simple examples/simple.log`.
 
 ## 3. Audit
 
 As mentioned, we implemented the checker as part of the main program. A boolean flag is used to select checker mode. See `main.go` for the code that deals with the flag and other arguments, and `checker.go` for the checker function itself.
 
-You'll find the configuration files and logs for the given examples in the `examples` folder, together with the two examples we were required to create: `zen` (finite) and `matryushka` (infinite).
-
+You'll find the configuration files and logs for the given examples in the `examples` folder, together with the two home-made examples we were required to create: `zen` (finite) and `matryushka` (infinite).
+simple
 Exact outputs may vary from those suggested in the audit questions, especially where time is not to be optimized, since, in that case, there is less constraint on how soon tasks can be scheduled. Thus, for `seller`, the audit suggestion takes a more leisurely approach, whereas our program schedules processes as soon as the precedence relations allow, because why not?
 
 Please note that we've chosen to interpret the time parameter as marking when to end the schedule function. Writing the output file and printing the result to the terminal happen after that. This seemed like the most natural interpretation of the instructions, particularly as printing to the terminal is an optional extra for ease of viewing long outputs. It has no bearing on the result of the audit, which just asks you to confirm that fewer processes are performed in 0.003s than 1s for the example `fertilizer`.

@@ -22,8 +22,6 @@ func checker(resources map[string]int, processes []process, goal goal) {
 		p[processes[i].name] = &processes[i]
 	}
 
-	fmt.Println()
-
 	scanner := bufio.NewScanner(file)
 	isFirstLine := true
 	for scanner.Scan() {
@@ -53,7 +51,6 @@ func checker(resources map[string]int, processes []process, goal goal) {
 				fmt.Println("Error detected")
 				fmt.Printf("at %s stock insufficient\n", line)
 				fmt.Println("Exiting...")
-				fmt.Println()
 				os.Exit(0)
 			}
 			resources[ingredient.name] -= ingredient.quantity
@@ -63,6 +60,5 @@ func checker(resources map[string]int, processes []process, goal goal) {
 		}
 	}
 	fmt.Println("Trace completed, no error detected.")
-	fmt.Println()
 	os.Exit(0)
 }
