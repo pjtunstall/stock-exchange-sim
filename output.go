@@ -62,4 +62,6 @@ func writeOutput(s string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println("Output written to", logFilename)
 }

@@ -55,7 +55,7 @@ func parseFile(config string) ([]resource, []process, goal, error) {
 		}
 
 		// If the line is not a comment, resource, goal, or process, return an error.
-		return nil, nil, goal{}, fmt.Errorf("invalid line: %s", line)
+		return nil, nil, goal{}, fmt.Errorf("invalid line: `%s`", line)
 	}
 
 	// Missing resources, processes, or goal.

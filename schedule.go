@@ -7,7 +7,6 @@ import (
 
 func schedule(resources map[string]int,
 	processes []process,
-	goal goal,
 	finite bool,
 	c <-chan struct{},
 	ubik string) (int, string) {

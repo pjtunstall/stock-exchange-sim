@@ -12,19 +12,19 @@
 
 This is a project in the [01 Edu](https://01-edu.org/) system, introducing the idea of a [process chain](https://en.wikipedia.org/wiki/Event-driven_process_chain). It's an optional extra, at least for us at 01Founders in London, 2024. It can be done in any compiled language. We chose Go.
 
-According to the [instructions](https://github.com/01-edu/public/tree/master/subjects/stock-exchange-sim), we need to write a program, `stock`, that takes two command-line arguments.
+According to the [instructions](https://github.com/01-edu/public/tree/master/subjects/stock-exchange-sim), we need to write a program, `stock`, that takes one or two command-line arguments.
 
-This first is the path to a text file, which they call a "configuration file", formatted in a certain way. Our program should derive information, from this file, about a project. The file will contain a list of resources and quantities of each available at the start of the project; a list of processes with information about which resources they consume, in what quantity, and what products they produce and in what quantity; also, how long each process takes. Finally, it will specify the goal of the project, in the form of an item whose production should be "optimized", i.e. maximized.
+This first argument is required. This argument needs to be the path to a text file, about a fictional project, such as building a cabinet (`examples/build`) or growing apples (`examples/fertilizer`). There are two types of task: those that have a finite objective, such as building the cabinet, and those that can continue indefinitely thanks to renewable resources, such as growing the apples, eating them, and planting the seeds to produce more apple trees.
 
-The configuration file can also specify that time should be optimized too. In the case of non-renewable resources, we take this to mean that time should be minimized provided that the maximum amount of the goal is produced.
+A correctly formatted file will contain a list of resources, together with the quantities of each resource available at the start of the project. It will list processes with information about which resources each process consumes, how many units of each resource the process consumes, what items it can produce (given those resources), and how many of each it results in. The file should also say how long each process takes. Finally, it will specify the goal of the project, in the form of an item to be "optimized", i.e. maximized.
+
+This 'configuration file', as the instructions refer to it, may specify that time should be optimized too. In the case of non-renewable resources, we take this to mean that time should be minimized provided that the maximum amount of the goal is produced. No definition is given for what this might mean in the case of cyclic<sup id="ref-f1">[1](#f1)</sup> projects, and the only example of such a project does not mention time.
 
 Comments in some of the examples suggest the possibility of multiple resources to optimize, but none of the examples actually realize that possibility. The line of the examples that cites the goal always has the format `optimize:(<stock_name>)` or `optimize:(time;<stock_name>)`. Although the instructions speak of "elements" to optimize, the format they specify is `optimize:(<stock_name>|time)`. No indication is given of how one would decide between conflicting goals. We could show precedence by the order they're listed in, but, for now, have taken the easier path of assuming only one stock item is to be maximized.
 
-The second argument is an integer representing the maximum number of seconds the program must take to execute.
+Optionally the program takes a second argument, an integer representing the maximum number of seconds the program should run for. Although syntactically optional, this argument is necessary, in practice, for projects with renewable resources that cycle<sup id="ref-f1">[1](#f1)</sup> indefinitely. If omitted, `stock` will run for 1s by default.
 
-There are two types of task: those that can continue indefinitely thanks to renewable resources, and those that have a finite objective.
-
-Given a configuration file `build`, our program, `stock`, should produce a text file `build.log`, consisting of a schedule: a list of processes (possibly including several instances of the same process, possibly overlapping), the statement "No more process doable at", followed by an integer one unit greater than the duration of whole project, and a list of stock (resources and products) left at the end.
+Given a configuration file `examples/build`, our program, `stock`, should produce a text file `examples/build.log`, consisting of a schedule: a list of processes (possibly including several instances of the same process, possibly overlapping), the statement "No more process doable at", followed by an integer one unit greater than the duration of whole project, and a list of stock (resources and products) left at the end.
 
 We should also make a checker that will check the processes listed in a log file and confirm that there are enough resources to perform each task listed at the specified start time.
 
@@ -44,11 +44,13 @@ We've chosen to implement the checker as part of the same program. To check `sim
 
 As mentioned, we implemented the checker as part of the main program. A boolean flag is used to select checker mode. See `main.go` for the code that deals with the flag and other arguments, and `checker.go` for the checker function itself.
 
-You'll find the configuration files and logs for the given examples in the `examples` folder, together with the two home-made examples we were required to create: `zen` (finite) and `matryushka` (infinite).
-simple
-Exact outputs may vary from those suggested in the audit questions, especially where time is not to be optimized, since, in that case, there is less constraint on how soon tasks can be scheduled. Thus, for `seller`, the audit suggestion takes a more leisurely approach, whereas our program schedules processes as soon as the precedence relations allow, because why not?
+You'll find the configuration files for the given examples in the `examples` folder, together with the two examples we were required to create: `zen` (finite) and `matryushka` (infinite). (We actually made three. There's a bonus finite one: `macguffin`.)
 
-Please note that we've chosen to interpret the time parameter as marking when to end the schedule function. Writing the output file and printing the result to the terminal happen after that. This seemed like the most natural interpretation of the instructions, particularly as printing to the terminal is an optional extra for ease of viewing long outputs. It has no bearing on the result of the audit, which just asks you to confirm that fewer processes are performed in 0.003s than 1s for the example `fertilizer`.
+Exact outputs may vary from those suggested in the audit questions, especially where time is not to be optimized, since, in that case, there is less constraint on how soon tasks can be scheduled. Thus, for `seller`, the audit suggestion takes a more leisurely approach, whereas our program schedules processes as soon as the precedence relations allow, because why not? The finite examples are all simple enough to confirm manually that the logs are correct. The cyclic ones can be examined for a few cycles<sup id="ref-f1">[1](#f1)</sup> (in the sense of complete iterations of the project) to get the idea.
+
+Please note that we've chosen to interpret the time parameter as marking when to end the schedule function itself. Writing the output file (and printing the result to the terminal, if you choose to uncomment those lines in `main.go`) happen after the schedule is made. This seemed like the most natural interpretation of the instructions, particularly as printing to the terminal is an optional extra for the convenience of viewing small outputs without having to open the log file. It has no bearing on the result of the audit, which just asks you to confirm that fewer processes are performed in 0.003s than 1s for the example `fertilizer`.
+
+Note also that how much the program can accomplish in a given time may vary depending on your computer and what it's is doing in the background on a given occasion. On one occasion, you might find that `./stock /examples/matryushka 0.001` manages several hundred iterations of its cyclic<sup id="ref-f1">[1](#f1)</sup> project. On another, it might not have time for any.
 
 ## 4. Research
 
@@ -82,7 +84,7 @@ Now, define `maxCount` as the least common multiple of the denominators of all t
 
 While the current task array is not empty, we check whether each task can be performed `count` number of times, given the resources. If not, it can't be scheduled any more. If so, it will be scheduled as soon as possible, given the durations and start times of its precursors. We consider initial processes first, then their successors, and so on, till the final process has been scheduled. Then we return to the beginning (the next pass), and keep going till there are no more resources to proceed.
 
-For finite projects, the end time is defined as the start time of the final process plus its duration. For cycling projects, the provisional end time is updated as tasks are scheduled, and returned along with the schedule when the timer signals to finish.
+For finite projects, the end time is defined as the start time of the final process plus its duration. For cycling<sup id="ref-f1">[1](#f1)</sup> projects, the provisional end time is updated as tasks are scheduled, and returned along with the schedule when the timer signals to finish.
 
 The examples show that more than one instance of a process can be scheduled simultaneously, which makes time optimization trivial: just schedule as many instances of all tasks, in the necessary proportions, as resources permit.
 
@@ -108,3 +110,5 @@ Note the sensitivity to task-listing order of our own example `macguffin`.
 If we content ourselves with a heuristic, should we favor not wasting surplus when resources are plentiful, or should we make sure we obtain at least one unit of the end product however meager they are? The answer might depend on the user's objective. It could be left as an option.
 
 A better scheme might be to consider the linking item and divide the quantity required by the quantity produced, then take the ceiling to obtain the minimum number of times the producer needs to be performed to contribute one unit of its successor, provided other requirements are met. If there are multiple linking items, as in `fertilizer`, we'd chose the maximum of these ceilings. Having found how many times each task needs to be executed to obtain a unit of the goal, a first pass of scheduling could be performed, and the resources updated. In this way, a solution could be found incrementally ...
+
+<a id="f1" href="#ref-f1">1</a>: Unfortunately, the instructions use the word 'cycle' to mean a unit of time, as specified in a configuration file. I sometimes refer to projects that can cycle indefinitely (thanks to renewable resources) as cyclic. To avoid confusion, I've tried to clarify what I mean when discussing cycles in the sense of complete interations or runs through the project from initial resources to production of the item that is the goal, returning the system to its initial state. (Note that I've also used `iteration` to refer to instances of an individual process, such as `do_doorknobs`, being performed. I hope this will be clear from the context.)

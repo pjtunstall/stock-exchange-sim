@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func checker(resources map[string]int, processes []process, goal goal) {
+func checker(resources map[string]int, processes []process) {
 	file, err := os.Open("./" + flag.Arg(1))
 	if err != nil {
 		log.Fatalf("error parsing log file: %v", err)
@@ -37,13 +37,20 @@ func checker(resources map[string]int, processes []process, goal goal) {
 		}
 		cycle := ln[0]
 		name := ln[1]
-		if _, ok := strconv.Atoi(cycle); ok != nil {
-			break
+
+		trimmedCycle := strings.TrimSpace(cycle)
+		if _, err := strconv.Atoi(trimmedCycle); err != nil {
+			fmt.Printf("Error parsing cycle: %v\n", err)
+			fmt.Println("Exiting...")
+			os.Exit(1)
 		}
 
 		process, ok := p[name]
 		if !ok {
-			log.Fatalf("process %s not found", name)
+			fmt.Println("Error detected")
+			fmt.Printf("process %s not found\n", name)
+			fmt.Println("Exiting...")
+			os.Exit(1)
 		}
 
 		for _, ingredient := range process.ingredients {
@@ -51,7 +58,7 @@ func checker(resources map[string]int, processes []process, goal goal) {
 				fmt.Println("Error detected")
 				fmt.Printf("at %s stock insufficient\n", line)
 				fmt.Println("Exiting...")
-				os.Exit(0)
+				os.Exit(1)
 			}
 			resources[ingredient.name] -= ingredient.quantity
 		}
