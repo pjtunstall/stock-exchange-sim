@@ -58,19 +58,13 @@ Please note that we've chosen to interpret the time parameter as marking when to
 
 Note also that how much the program can accomplish, in a given time, may vary depending on your computer and what it's is doing in the background on a given occasion. On one occasion, you might find that `./stock /examples/matryushka 0.001` manages several hundred iterations of its cyclic<sup id="ref-f1">[1](#f1)</sup> project. On another, it might not have time for any.
 
-```It is up to you to create and organize the display, it must nevertheless allow the understanding of the main actions carried out by the program.
-
-```
+The instructions say, "It is up to you to create and organize the display, it must nevertheless allow the understanding of the main actions carried out by the program."
 
 By default, we just write the the result to a log file. If you'd like to see it in the console too, you can uncomment the indicated line in `main.go` (before building the binary). This works fine for naturally terminating projects, but be warned that, when let run for even a few miliseconds, the indefinitely looping ones, `fertilizer` and `matryushka`, can output hundreds of thousands of lines. So, if you're using the Zsh script, you might want to just view the log files.
 
-In the section about the checker, the instructions say,
+In the section about the checker, the instructions say, "The display must indicate whether the sequence is correct, or indicate the cycle and the process which are causing the problem. In all cases, at the end of the program, stocks are displayed, as well as the last cycle."
 
-```The display must indicate whether the sequence is correct, or indicate the cycle and the process which are causing the problem. In all cases, at the end of the program, stocks are displayed, as well as the last cycle.
-
-```
-
-But the examples in the instructions and the audit are of the form
+But the examples shown, both in the instructions and the audit, are of the form
 
 ```Evaluating: 0:buy_materiel
 Evaluating: 10:build_product
