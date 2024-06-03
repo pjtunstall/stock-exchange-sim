@@ -42,7 +42,7 @@ We've chosen to implement the checker as part of the same program. To check `sim
 
 ## 3. Audit
 
-A Zsh script, `audit.zsh`, is provided, for your convenience, to run the examples in the Functional section. Alternatively, you're welcome to type any or all of the commands yourself. In either case, please take care to check the resulting files and ask any questions you might have about the project.
+A Zsh script, `audit.zsh`, is provided for your convenience to run the examples in the Functional section. Alternatively, you're welcome to type any or all of the commands yourself. In either case, please take care to check the resulting files and ask any questions you might have about the project.
 
 As mentioned, we implemented the checker as part of the main program. A boolean flag is used to select checker mode. See `main.go` for the code that deals with the flag and other arguments, and `checker.go` for the checker function itself.
 
@@ -72,7 +72,7 @@ Evaluating: 40:delivery
 Trace completed, no error detected.
 ```
 
-(Thus displaying neither stock nor "cycle"<sup id="ref-f1">[1](#f1)</sup>.) We've chosen to follow the the format exemplified rather than that described. Maybe the description was a mistake or meant to refer instead to the schedule-generator program, which does indeed list any remaining stock and the last (or, rather, one after the last) cycle.
+(Thus displaying neither stock nor "cycle"<sup id="ref-f1">[1](#f1)</sup>.) We've chosen to follow the the format exemplified rather than that described. Maybe the description was a mistake or meant to refer instead to the schedule-generator program, which does indeed list any remaining stock and the last cycle. (Or, rather, the one after the last, in accordance with the examples shown.)
 
 ## 4. Research
 
