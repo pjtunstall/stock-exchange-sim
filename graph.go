@@ -6,7 +6,7 @@ func buildGraph(resources []resource, processes []process, g goal) (bool, string
 	// Maximum number of predecessors for a process. Adjust as needed.
 	n := 64
 
-	// Identify resources that is produced by every process,
+	// Identify resources that are produced by every process,
 	// such as "you" in the fertilizer example.
 	var ubik string
 	for _, resource := range resources {
