@@ -1,14 +1,14 @@
 # stock-exchange-sim
 
-0. [Brief](#0-brief)
-1. [Setup](#1-setup)
-2. [Usage](#2-usage)
-3. [Audit](#3-audit)
-4. [Research](#4-research)
-5. [Strategy](#5-strategy)
-6. [Further](#6-further)
+1. [Brief](#0-brief)
+2. [Setup](#1-setup)
+3. [Usage](#2-usage)
+4. [Audit](#3-audit)
+5. [Research](#4-research)
+6. [Strategy](#5-strategy)
+7. [Further](#6-further)
 
-## 0. Brief
+## 1. Brief
 
 This is a project in the [01 Edu](https://01-edu.org/) system, introducing the idea of a [process chain](https://en.wikipedia.org/wiki/Event-driven_process_chain). It's an optional extra, at least for us at 01Founders in London, 2024. It can be done in any compiled language. We chose Go.
 
@@ -20,7 +20,15 @@ A correctly formatted file will contain a list of resources, together with the q
 
 This 'configuration file', as the instructions refer to it, may specify that time should be optimized too. In the case of non-renewable resources, we take this to mean that time should be minimized provided that the maximum amount of the goal is produced. No definition is given for what this might mean in the case of cyclic<sup id="ref-f2">[2](#f2)</sup> projects. (How would one minimize the duration of a neverending project?) The only example of such a project does not mention time.
 
-Comments in some of the examples suggest the possibility of multiple resources to optimize, but none of the examples actually realize that possibility. The line of the examples that cites the goal always has the format `optimize:(<stock_name>)` or `optimize:(time;<stock_name>)`. Although the instructions speak of "elements" to optimize, the format they specify is `optimize:(<stock_name>|time)`. No indication is given of how one would decide between conflicting goals. We could show precedence by the order they're listed in, but, for now, we've taken the easier path of assuming only one stock item is to be maximized.
+The comment below, found in some of the examples, suggest the possibility of multiple resources to optimize, but none of the examples actually realize that possibility. The line of the examples that cites the goal always has the format `optimize:(<stock_name>)` or `optimize:(time;<stock_name>)`. Although the instructions speak of "elements" to optimize, the format they specify is `optimize:(<stock_name>|time)`. No indication is given of how one would decide between conflicting goals. We could show precedence by the order they're listed in, but, for now, we've taken the easier path of assuming only one stock item is to be maximized.
+
+```
+# optimize time for 0 stock and no process possible,
+# or maximize some products over a long delay
+# optimize:(stock1;stock2;...)
+```
+
+The comment might be taken to indicate a choice between optimizing "time" to exhausting resources (regardless of what's produced) or optimizing "some products" (regardless of how long this takes), but no example includes time without also including a product to optimize. The former objective defies common sense; the latter is trivial, given that there is no conflict, so time can be optimized whether this is a stated requirement or not.
 
 Our program should take an optional second argument, an integer representing the maximum number of seconds the program is to run for. Although syntactically optional, this argument is necessary, in practice, for projects with renewable resources that cycle<sup id="ref-f2">[2](#f2)</sup> indefinitely. If omitted, `stock` will run for 1s by default.
 
@@ -28,11 +36,11 @@ Given a configuration file `examples/build`, our program, `stock`, should produc
 
 We should also make a checker that will check the processes listed in a log file and confirm that there are enough resources to perform each task listed at the specified start time.
 
-## 1. Setup
+## 2. Setup
 
 To build an executable file of the `stock` program, navigate into the `stock-exchange-sim` folder and run the command `go build -o stock`. You could also type `go run . <file>`, but we recommend building an executable first if you want to see that the timer is working. Otherwise you'd to wait for the program to compile before it runs for the duration you specify.
 
-## 2. Usage
+## 3. Usage
 
 Enter `./stock examples/simple` to create a schedule for the example called `simple`.
 
@@ -40,7 +48,7 @@ Run `./stock simple 10` to specify that the program should not take longer than 
 
 We've chosen to implement the checker as part of the same program. To check `simple.log`, run `./stock -checker examples/simple examples/simple.log`.
 
-## 3. Audit
+## 4. Audit
 
 A Zsh script, `audit.zsh`, is provided for your convenience to run the examples in the Functional section. Alternatively, you're welcome to type any or all of the commands yourself. In either case, please take care to check the resulting files and ask any questions you might have about the project.
 
@@ -74,7 +82,7 @@ Trace completed, no error detected.
 
 (Thus displaying neither stock nor "cycle"<sup id="ref-f2">[2](#f2)</sup>.) We've chosen to follow the format exemplified rather than that described. Maybe the description was a mistake or meant to refer instead to the schedule-generator program, which does indeed list any remaining stock and the last cycle. (Or, rather, the one after the last, in accordance with the examples shown.)
 
-## 4. Research
+## 5. Research
 
 Following the recommendation of the project description, we consulted [PM Knowledge Center](https://www.pmknowledgecenter.com), a collection of resources on "Project Management and Dynamic Scheduling". We found further background reading necessary to fill in the gaps in the explanations there: in particular, [Kolisch (1994)](https://www.econstor.eu/bitstream/10419/155418/1/manuskript_344.pdf). These sources describe what's known as a Resource Constrained Project Scheduling Problem. The heuristic type of solution our instructions direct us towards is called Priority Rule Based Scheduling.
 
@@ -90,7 +98,7 @@ A SERIAL schedule generation scheme with N tasks takes N steps. One task is chos
 
 A PARALLEL schedule generation scheme with N tasks takes at most N steps. At each step, we schedule zero or more activities. Tasks are partitioned into completed, in progress, and available. The schedule time associated with a step is calculated as the earliest completion time of the tasks that were in progress during the previous step. Tasks whose finish time is equal to the schedule time are moved from the set of tasks in progress to the set of completed tasks. This may make other tasks available. As long as tasks are available, they're chosen one by one, in order as in a serial scheme, and started at the current schedule time, then we move on to the next step. The algorithm terminates when all tasks are completed or in progress.
 
-## 5. Strategy
+## 6. Strategy
 
 After all that, neither scheme quite works for us, given the different underlying assumptions of our project: multiple instances of a task schedulable, possibly simultaneously. But we can take inspiration from them.
 
@@ -110,7 +118,7 @@ For finite projects, the end time is defined as the start time of the final proc
 
 The examples show that more than one instance of a process can be scheduled simultaneously, which makes time optimization trivial: just schedule as many instances of all tasks, in the necessary proportions, as resources permit.
 
-## 6. Further
+## 7. Further
 
 While this program does generate plausible schedules for the given examples and our own simple configuration files, it's far from robust. It doesn't yet allow for the possibility of one task having multiple successors. It assumes tasks have been well chosen and just need giving start times and number of instances to perform at those times. It doesn't decide effectively between rival processes having the same input and output, whether of the same or differing effectiveness:
 
